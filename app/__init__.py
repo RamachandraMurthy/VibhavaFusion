@@ -105,6 +105,9 @@ def create_app(config_class=Config):
     from app.routes.dashboard import dashboard_bp
     app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
     
+    from app.routes.ai_console import bp as ai_console_bp
+    app.register_blueprint(ai_console_bp)
+    
     # Register error handlers
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
