@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - {{ current_user.username }}{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-header-content">
+            <img src="{{ profile.avatar_url or url_for('static', filename='images/default-avatar.svg') }}" 
+                 alt="Profile Picture" 
+                 class="profile-avatar">
+            <div class="profile-info">
+                <h1 class="profile-name">{{ profile.full_name or current_user.username }}</h1>
+                <div class="profile-metadata">
+                    {% if profile.location %}
+                    <div class="profile-metadata-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>{{ profile.location }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="profile-metadata-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>{{ current_user.email }}</span>
+                    </div>
+                    {% if profile.website %}
+                    <div class="profile-metadata-item">
+                        <i class="fas fa-globe"></i>
+                        <a href="{{ profile.website }}" target="_blank" class="text-white hover:underline">
+                            {{ profile.website }}
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="profile-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} mb-4">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Bio Section -->
+        <div class="profile-section">
+            <h2 class="profile-section-title">About</h2>
+            <p class="text-gray-700">{{ profile.bio or 'No bio added yet.' }}</p>
+        </div>
+
+        <!-- Preferences Section -->
+        <div class="profile-section">
+            <h2 class="profile-section-title">Preferences</h2>
+            <div class="preferences-grid">
+                <div class="preference-card">
+                    <h3 class="preference-title">Theme</h3>
+                    <p class="preference-description">Current theme: {{ profile.preferences.get('theme', 'light')|title }}</p>
+                </div>
+                <div class="preference-card">
+                    <h3 class="preference-title">Language</h3>
+                    <p class="preference-description">Preferred language: {{ profile.preferences.get('language', 'en')|upper }}</p>
+                </div>
+                <div class="preference-card">
+                    <h3 class="preference-title">Notifications</h3>
+                    <p class="preference-description">
+                        Email notifications: {{ 'Enabled' if profile.preferences.get('email_notifications', True) else 'Disabled' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="{{ url_for('profile.edit_profile') }}" class="button primary">
+                <i class="fas fa-edit"></i>Edit Profile
+            </a>
+            <a href="{{ url_for('profile.manage_preferences') }}" class="button secondary">
+                <i class="fas fa-cog"></i>Manage Preferences
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

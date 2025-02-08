@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Preferences - {{ current_user.username }}{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-header-content">
+            <img src="{{ profile.avatar_url or url_for('static', filename='images/default-avatar.svg') }}" 
+                 alt="Profile Picture" 
+                 class="profile-avatar">
+            <div class="profile-info">
+                <h1 class="profile-name">Manage Preferences</h1>
+                <p class="text-white opacity-80">Customize your experience</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} mb-4">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" class="profile-form">
+            <!-- Email Notifications -->
+            <div class="profile-section">
+                <h2 class="profile-section-title">Notifications</h2>
+                <div class="preference-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="preference-title">Email Notifications</h3>
+                            <p class="preference-description">Receive email notifications about important updates and messages</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" 
+                                   name="email_notifications" 
+                                   {{ 'checked' if profile.preferences.get('email_notifications', True) }}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme Selection -->
+            <div class="profile-section">
+                <h2 class="profile-section-title">Appearance</h2>
+                <div class="preference-card">
+                    <h3 class="preference-title">Theme</h3>
+                    <p class="preference-description">Choose your preferred theme</p>
+                    <select name="theme" 
+                            class="form-input mt-2"
+                            aria-label="Theme selection">
+                        <option value="light" {{ 'selected' if profile.preferences.get('theme') == 'light' }}>Light</option>
+                        <option value="dark" {{ 'selected' if profile.preferences.get('theme') == 'dark' }}>Dark</option>
+                        <option value="system" {{ 'selected' if profile.preferences.get('theme') == 'system' }}>System</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Language Selection -->
+            <div class="profile-section">
+                <h2 class="profile-section-title">Language & Region</h2>
+                <div class="preference-card">
+                    <h3 class="preference-title">Display Language</h3>
+                    <p class="preference-description">Select your preferred language</p>
+                    <select name="language" 
+                            class="form-input mt-2"
+                            aria-label="Language selection">
+                        <option value="en" {{ 'selected' if profile.preferences.get('language') == 'en' }}>English</option>
+                        <option value="es" {{ 'selected' if profile.preferences.get('language') == 'es' }}>Español</option>
+                        <option value="fr" {{ 'selected' if profile.preferences.get('language') == 'fr' }}>Français</option>
+                        <option value="de" {{ 'selected' if profile.preferences.get('language') == 'de' }}>Deutsch</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button type="submit" class="button primary">
+                    <i class="fas fa-save"></i>Save Preferences
+                </button>
+                <a href="{{ url_for('profile.view_profile') }}" class="button secondary">
+                    <i class="fas fa-times"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

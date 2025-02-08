@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - {{ current_user.username }}{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-header-content">
+            <img src="{{ profile.avatar_url or url_for('static', filename='images/default-avatar.svg') }}" 
+                 alt="Profile Picture" 
+                 class="profile-avatar">
+            <div class="profile-info">
+                <h1 class="profile-name">Edit Profile</h1>
+                <p class="text-white opacity-80">Update your personal information</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} mb-4">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" class="profile-form">
+            <!-- Full Name -->
+            <div class="form-group">
+                <label for="full_name" class="form-label">Full Name</label>
+                <input type="text" 
+                       name="full_name" 
+                       id="full_name"
+                       value="{{ profile.full_name or '' }}"
+                       class="form-input"
+                       placeholder="Enter your full name">
+            </div>
+
+            <!-- Bio -->
+            <div class="form-group">
+                <label for="bio" class="form-label">Bio</label>
+                <textarea name="bio" 
+                          id="bio"
+                          class="form-textarea"
+                          placeholder="Tell us about yourself">{{ profile.bio or '' }}</textarea>
+            </div>
+
+            <!-- Location -->
+            <div class="form-group">
+                <label for="location" class="form-label">Location</label>
+                <input type="text" 
+                       name="location" 
+                       id="location"
+                       value="{{ profile.location or '' }}"
+                       class="form-input"
+                       placeholder="Enter your location">
+            </div>
+
+            <!-- Website -->
+            <div class="form-group">
+                <label for="website" class="form-label">Website</label>
+                <input type="url" 
+                       name="website" 
+                       id="website"
+                       value="{{ profile.website or '' }}"
+                       class="form-input"
+                       placeholder="Enter your website URL">
+            </div>
+
+            <!-- Avatar URL -->
+            <div class="form-group">
+                <label for="avatar_url" class="form-label">Avatar URL</label>
+                <input type="url" 
+                       name="avatar_url" 
+                       id="avatar_url"
+                       value="{{ profile.avatar_url or '' }}"
+                       class="form-input"
+                       placeholder="Enter URL for your profile picture">
+                <small class="form-help text-gray-500">Enter a URL for your profile picture, or leave blank to use the default avatar</small>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button type="submit" class="button primary">
+                    <i class="fas fa-save"></i>Save Changes
+                </button>
+                <a href="{{ url_for('profile.view_profile') }}" class="button secondary">
+                    <i class="fas fa-times"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

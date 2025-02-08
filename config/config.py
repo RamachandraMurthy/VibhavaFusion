@@ -45,7 +45,7 @@ class Config:
     TEMPLATES_FOLDER = 'templates'
     
     # Application settings
-    APP_NAME = 'Flask Template'
+    APP_NAME = 'VibhavaFusion'
     PERSISTENT_STORAGE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'storage', 'data')
 
 class DevelopmentConfig(Config):

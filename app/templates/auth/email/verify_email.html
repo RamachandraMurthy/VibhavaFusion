@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #059669;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h2>Welcome to VibhavaFusion!</h2>
+    <p>Dear {{ user.username }},</p>
+    <p>Thank you for registering with VibhavaFusion. To complete your registration and verify your email address, please click the button below:</p>
+    
+    <a href="{{ url_for('auth.verify_email', token=token, _external=True) }}" class="button">
+        Verify Email Address
+    </a>
+    
+    <p>If the button doesn't work, you can also copy and paste this link into your browser:</p>
+    <p>{{ url_for('auth.verify_email', token=token, _external=True) }}</p>
+    
+    <p>This verification link will expire in 24 hours.</p>
+    
+    <div class="footer">
+        <p>If you did not register for a VibhavaFusion account, please ignore this email.</p>
+        <p>Best regards,<br>The VibhavaFusion Team</p>
+    </div>
+</body>
+</html> 

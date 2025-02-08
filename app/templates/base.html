@@ -3,49 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{{ config.APP_NAME }}{% endblock %}</title>
+    <title>{% block title %}{% endblock %} - {{ config.APP_NAME }}</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Central stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     
-    <!-- Page-specific styles block -->
+    <!-- Page-specific styles -->
     {% block styles %}{% endblock %}
 </head>
 <body>
-    <header>
-        <nav class="main-nav">
-            <div class="nav-brand">
-                <a href="{{ url_for('main.index') }}">{{ config.APP_NAME }}</a>
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="brand-container">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="VibhavaFusion Logo">
+                </div>
+                <a href="{{ url_for('main.index') }}" class="brand-text">{{ config.APP_NAME }}</a>
             </div>
             <div class="nav-links">
-                {% block nav_links %}
                 <a href="{{ url_for('main.index') }}" class="nav-link">Home</a>
-                {% endblock %}
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('avatar.create') }}" class="nav-link">Create Avatar</a>
+                    <div class="user-menu">
+                        <button type="button" class="button secondary user-profile">
+                            <i class="fas fa-user"></i>
+                            <span>{{ current_user.username }}</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="user-dropdown">
+                            <a href="{{ url_for('profile.view_profile') }}" class="dropdown-item">
+                                <i class="fas fa-id-card"></i>
+                                <span>View Profile</span>
+                            </a>
+                            <a href="{{ url_for('profile.edit_profile') }}" class="dropdown-item">
+                                <i class="fas fa-edit"></i>
+                                <span>Edit Profile</span>
+                            </a>
+                            <a href="{{ url_for('profile.manage_preferences') }}" class="dropdown-item">
+                                <i class="fas fa-cog"></i>
+                                <span>Preferences</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="{{ url_for('auth.logout') }}" class="dropdown-item text-error">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="button secondary">Login</a>
+                    <a href="{{ url_for('auth.register') }}" class="button primary">Register</a>
+                {% endif %}
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
 
-    <main class="container">
+    <div class="main-container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">
+                            {% if category == 'success' %}
+                                <i class="fas fa-check-circle"></i>
+                            {% elif category == 'error' %}
+                                <i class="fas fa-exclamation-circle"></i>
+                            {% elif category == 'info' %}
+                                <i class="fas fa-info-circle"></i>
+                            {% elif category == 'warning' %}
+                                <i class="fas fa-exclamation-triangle"></i>
+                            {% endif %}
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
             {% endif %}
         {% endwith %}
 
         {% block content %}{% endblock %}
-    </main>
+    </div>
 
     <footer>
-        <div class="container">
-            <p>&copy; {{ config.APP_NAME }} {{ now().year }}</p>
-        </div>
+        <p>&copy; {{ now().year }} {{ config.APP_NAME }}. All rights reserved.</p>
     </footer>
 
-    <!-- Page-specific scripts block -->
-    {% block scripts %}{% endblock %}
+    <!-- Page-specific scripts -->
+    {% block scripts %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const userMenu = document.querySelector('.user-menu');
+        const userDropdown = document.querySelector('.user-dropdown');
+        let timeoutId;
+
+        userMenu.addEventListener('mouseenter', function() {
+            clearTimeout(timeoutId);
+            userDropdown.style.opacity = '1';
+            userDropdown.style.visibility = 'visible';
+            userDropdown.style.transform = 'translateY(0)';
+        });
+
+        userMenu.addEventListener('mouseleave', function(e) {
+            timeoutId = setTimeout(() => {
+                if (!userDropdown.matches(':hover')) {
+                    userDropdown.style.opacity = '0';
+                    userDropdown.style.visibility = 'hidden';
+                    userDropdown.style.transform = 'translateY(-10px)';
+                }
+            }, 100);
+        });
+    });
+    </script>
+    {% endblock %}
+
+    <style>
+    .user-menu {
+        position: relative;
+        display: inline-block;
+    }
+
+    .user-profile {
+        padding: 0.5rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+    }
+
+    .user-dropdown {
+        position: absolute;
+        right: 0;
+        top: calc(100% - 5px);
+        background-color: var(--surface-color);
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        min-width: 200px;
+        opacity: 0;
+        visibility: hidden;
+        z-index: 1050;
+        margin-top: 0.5rem;
+        border: 1px solid var(--border-color);
+        padding: 0.5rem 0;
+        background: white;
+        transition: all 0.2s ease-in-out;
+        transform: translateY(-10px);
+    }
+
+    .user-menu:hover .user-dropdown {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    /* Add padding to create a hover buffer zone */
+    .user-dropdown::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        left: 0;
+        right: 0;
+        height: 20px;
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: background-color 0.2s;
+        font-size: 0.875rem;
+        cursor: pointer;
+        width: 100%;
+        border: none;
+        background: none;
+        text-align: left;
+    }
+
+    .dropdown-item:hover {
+        background-color: var(--background-color);
+    }
+
+    .dropdown-item i {
+        font-size: 1rem;
+        width: 1.25rem;
+        text-align: center;
+        opacity: 0.7;
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background-color: var(--border-color);
+        margin: 0.5rem 0;
+    }
+
+    .text-error {
+        color: var(--error-color) !important;
+    }
+
+    .text-error:hover {
+        background-color: #FEE2E2 !important;
+    }
+    </style>
 </body>
 </html> 

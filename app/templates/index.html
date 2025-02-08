@@ -1,111 +1,55 @@
 {% extends "base.html" %}
 
-{% block title %}Home - {{ config.APP_NAME }}{% endblock %}
+{% block title %}Welcome{% endblock %}
 
 {% block content %}
-<div class="welcome-section">
-    <h1>Welcome to {{ config.APP_NAME }}</h1>
-    <p class="lead">
-        This is a modular Flask application template designed for efficient development
-        and easy maintenance.
-    </p>
-    
-    <div class="features">
-        <h2>Template Features</h2>
-        <ul>
-            <li>Modular project structure</li>
-            <li>Configuration management</li>
-            <li>Persistent storage system</li>
-            <li>Central styling with modern CSS</li>
-            <li>Responsive design</li>
-        </ul>
+<section class="hero">
+    <h1>Experience AI Companionship</h1>
+    <p>Create and interact with personalized AI avatars that learn and grow with you</p>
+    {% if not current_user.is_authenticated %}
+        <div class="hero-buttons">
+            <a href="{{ url_for('auth.register') }}" class="button primary">Get Started</a>
+            <a href="{{ url_for('auth.login') }}" class="button secondary">Sign In</a>
+        </div>
+    {% else %}
+        <div class="hero-buttons">
+            <a href="{{ url_for('avatar.create') }}" class="button primary">Create Your Avatar</a>
+            <a href="{{ url_for('profile.view_profile') }}" class="button secondary">View Profile</a>
+        </div>
+    {% endif %}
+</section>
+
+<section class="features">
+    <div class="feature-card">
+        <h3>Personalized AI Avatars</h3>
+        <p>Design unique AI companions that reflect your preferences and adapt to your communication style.</p>
     </div>
     
-    <div class="visit-counter">
-        <p>You've visited this page {{ visit_count }} time{% if visit_count != 1 %}s{% endif %}!</p>
+    <div class="feature-card">
+        <h3>Natural Conversations</h3>
+        <p>Experience meaningful dialogues with AI that understands context and learns from every interaction.</p>
     </div>
     
-    <div class="getting-started">
-        <h2>Getting Started</h2>
-        <p>
-            To start developing your application:
-        </p>
-        <ol>
-            <li>Modify the configuration in <code>config/config.py</code></li>
-            <li>Add your routes in the <code>app/routes/</code> directory</li>
-            <li>Create templates in <code>app/templates/</code></li>
-            <li>Add styles to <code>app/static/css/styles.css</code></li>
-        </ol>
+    <div class="feature-card">
+        <h3>Continuous Learning</h3>
+        <p>Watch your AI avatar evolve and develop a deeper understanding of your interests over time.</p>
     </div>
-</div>
+</section>
 {% endblock %}
 
 {% block styles %}
 <style>
-    /* Page-specific styles */
-    .welcome-section {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 2rem 0;
-    }
-    
-    .lead {
-        font-size: 1.25rem;
-        color: var(--secondary-color);
-        margin-bottom: 2rem;
-    }
-    
-    .features {
-        margin: 2rem 0;
-        padding: 2rem;
-        background-color: var(--light-color);
-        border-radius: 8px;
-    }
-    
-    .features h2 {
-        margin-bottom: 1rem;
-    }
-    
-    .features ul {
-        list-style-position: inside;
-        margin-left: 1rem;
-    }
-    
-    .features li {
-        margin-bottom: 0.5rem;
-    }
-    
-    .visit-counter {
-        text-align: center;
-        margin: 2rem 0;
-        padding: 1rem;
-        background-color: var(--info-color);
-        color: white;
-        border-radius: 8px;
-    }
-    
-    .getting-started {
-        margin: 2rem 0;
-    }
-    
-    .getting-started h2 {
-        margin-bottom: 1rem;
-    }
-    
-    .getting-started ol {
-        list-style-position: inside;
-        margin-left: 1rem;
-    }
-    
-    .getting-started li {
-        margin-bottom: 0.5rem;
-    }
-    
-    code {
-        background-color: var(--light-color);
-        padding: 0.2rem 0.4rem;
-        border-radius: 4px;
-        font-family: monospace;
+    @media (max-width: 768px) {
+        .hero-buttons {
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .hero-buttons .button {
+            width: 100%;
+            max-width: 300px;
+        }
     }
 </style>
 {% endblock %} 

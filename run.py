@@ -15,7 +15,7 @@ Usage:
     python run.py
     ```
     
-    This will start the development server on port 8080,
+    This will start the development server on port 5000,
     accessible from any network interface.
 
 Note:
@@ -23,10 +23,14 @@ Note:
     For production deployment, use a production-grade WSGI server.
 """
 
+import os
 from app import create_app
+from config import config
 
-app = create_app()
+# Get configuration based on environment
+config_name = os.environ.get('FLASK_CONFIG', 'default')
+app = create_app(config[config_name])
 
 if __name__ == '__main__':
     # Run the application in debug mode, accessible from any network interface
-    app.run(debug=True, host='0.0.0.0', port=8080) 
+    app.run(host='127.0.0.1', port=5000, debug=True) 

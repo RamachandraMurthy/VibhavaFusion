@@ -8,30 +8,38 @@ It handles all the necessary setup including:
 - Blueprint registration for modular routing
 - Error handler registration
 - Logging configuration
-- Persistent storage initialization
-- Template context processors for global template variables
+- Database initialization
+- Authentication setup
 
 Dependencies:
     - Flask: Web framework
-    - logging: For application-wide logging
-    - datetime: For template context processing
-    - config.config: Application configuration management
-    - storage.persistent: Persistent data storage system
+    - Flask-Login: For user authentication
+    - Flask-SQLAlchemy: For database operations
+    - Flask-Bcrypt: For password hashing
+    - Flask-Migrate: For database migrations
 """
 
 from flask import Flask, request, render_template
 import logging
 import os
 from datetime import datetime
-from config.config import get_config
-from storage.persistent import init_storage
+from flask_login import LoginManager
+from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
+from flask_migrate import Migrate
+from config import Config
 
-# Configure logging with detailed format for debugging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Initialize Flask extensions
+db = SQLAlchemy()
+bcrypt = Bcrypt()
+migrate = Migrate()
+login_manager = LoginManager()
+login_manager.login_view = 'auth.login'
+login_manager.login_message_category = 'info'
 
 def not_found_error(error):
     """Handle 404 Not Found errors.
@@ -57,52 +65,49 @@ def internal_error(error):
     logger.error(f"500 error: {error}")
     return render_template('500.html'), 500
 
-def create_app():
-    """Create and configure the Flask application.
-    
-    Returns:
-        Flask: The configured Flask application instance
-    """
+@login_manager.user_loader
+def load_user(user_id):
+    """Load a user from the database."""
+    from app.models.user import User
+    return User.query.get(int(user_id))
+
+def create_app(config_class=Config):
+    """Create and configure the Flask application."""
     app = Flask(__name__)
+    app.config.from_object(config_class)
     
-    # Load configuration
-    app.config.from_object(get_config())
+    # Initialize extensions
+    db.init_app(app)
+    bcrypt.init_app(app)
+    migrate.init_app(app, db)
+    login_manager.init_app(app)
     
-    # Ensure storage directory exists
-    storage_path = app.config['PERSISTENT_STORAGE_PATH']
-    logger.debug(f"Storage path: {storage_path}")
-    try:
-        os.makedirs(storage_path, exist_ok=True)
-        logger.debug("Storage directory created/verified")
-    except Exception as dir_error:
-        logger.error(f"Failed to create storage directory: {dir_error}")
-        raise
+    # Import models
+    from app.models.user import User
+    from app.models.profile import Profile
     
-    try:
-        # Initialize persistent storage
-        logger.debug("Before storage initialization")
-        init_storage(storage_path)
-        logger.debug("After storage initialization")
-        logger.info("Storage initialized successfully")
-    except Exception as e:
-        logger.error(f"Failed to initialize storage: {e}", exc_info=True)
-        raise
+    # Register blueprints
+    from app.routes.main import bp as main_bp
+    app.register_blueprint(main_bp)
     
-    try:
-        # Register blueprints
-        from app.routes.main import main_bp
-        app.register_blueprint(main_bp)
-        logger.info("Blueprints registered successfully")
-    except Exception as e:
-        logger.error(f"Failed to register blueprints: {e}")
+    from app.auth import bp as auth_bp
+    app.register_blueprint(auth_bp, url_prefix='/auth')
     
-    try:
-        # Register error handlers
-        app.register_error_handler(404, not_found_error)
-        app.register_error_handler(500, internal_error)
-        logger.info("Error handlers registered successfully")
-    except Exception as e:
-        logger.error(f"Failed to register error handlers: {e}")
+    from app.routes.avatar import bp as avatar_bp
+    app.register_blueprint(avatar_bp, url_prefix='/avatar')
+    
+    from app.routes.profile import profile_bp as profile_bp
+    app.register_blueprint(profile_bp)
+    
+    from app.routes.conversation import conversation_bp
+    app.register_blueprint(conversation_bp, url_prefix='/conversation')
+    
+    from app.routes.dashboard import dashboard_bp
+    app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
+    
+    # Register error handlers
+    from app.errors import bp as errors_bp
+    app.register_blueprint(errors_bp)
     
     # Add template context processors
     @app.context_processor
@@ -115,8 +120,6 @@ def create_app():
     @app.before_request
     def log_request_info():
         logger.info(f"Incoming request: {request.method} {request.url}")
-        logger.debug('Headers: %s', request.headers)
-        logger.debug('Body: %s', request.get_data())
     
     @app.after_request
     def log_response_info(response):
@@ -128,4 +131,11 @@ def create_app():
         """A simple test route to verify the application is working."""
         return "Flask application is running!"
     
-    return app 
+    # Create database tables
+    with app.app_context():
+        db.create_all()
+    
+    return app
+
+# Import models after db is defined
+from app.models import user, avatar, conversation 

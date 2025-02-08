@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - {{ current_user.username }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Welcome Section -->
+    <section class="dashboard-header">
+        <div class="profile-header-content">
+            <img src="{{ profile.avatar_url or url_for('static', filename='images/default-avatar.svg') }}" 
+                 alt="Profile Picture" 
+                 class="profile-avatar">
+            <div class="profile-info">
+                <h1 class="profile-name">Welcome back, {{ current_user.username }}!</h1>
+                <div class="profile-metadata">
+                    <span class="profile-metadata-item">
+                        <i class="fas fa-robot"></i>
+                        {{ avatars|length }} Avatar{{ 's' if avatars|length != 1 }}
+                    </span>
+                    <span class="profile-metadata-item">
+                        <i class="fas fa-comments"></i>
+                        {{ recent_conversations|length }} Recent Conversation{{ 's' if recent_conversations|length != 1 }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="dashboard-section">
+        <div class="section-header">
+            <h2 class="section-title">Quick Actions</h2>
+        </div>
+        <div class="quick-actions">
+            <a href="{{ url_for('avatar.create') }}" class="button primary">
+                <i class="fas fa-plus"></i>
+                Create New Avatar
+            </a>
+            <a href="{{ url_for('profile.edit_profile') }}" class="button secondary">
+                <i class="fas fa-user-edit"></i>
+                Edit Profile
+            </a>
+            <a href="{{ url_for('profile.preferences') }}" class="button secondary">
+                <i class="fas fa-cog"></i>
+                Preferences
+            </a>
+        </div>
+    </section>
+
+    <!-- Avatars Grid -->
+    <section class="dashboard-section">
+        <div class="section-header">
+            <h2 class="section-title">Your Avatars</h2>
+        </div>
+        <div class="avatars-grid">
+            {% if avatars %}
+                {% for avatar in avatars %}
+                    <div class="avatar-card">
+                        <img src="{{ avatar.image_url or url_for('static', filename='images/default-avatar.svg') }}" 
+                             alt="{{ avatar.name }}"
+                             class="avatar-image">
+                        <div class="avatar-info">
+                            <h3 class="avatar-name">{{ avatar.name }}</h3>
+                            <p class="avatar-description">{{ avatar.description[:100] }}...</p>
+                        </div>
+                        <div class="avatar-actions">
+                            <a href="{{ url_for('conversation.start', avatar_id=avatar.id) }}" class="button primary">
+                                Chat Now
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-robot fa-3x"></i>
+                    <h3>No Avatars Yet</h3>
+                    <p>Create your first AI avatar to start chatting!</p>
+                    <a href="{{ url_for('avatar.create') }}" class="button primary">
+                        Create Avatar
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Recent Conversations -->
+    <section class="dashboard-section">
+        <div class="section-header">
+            <h2 class="section-title">Recent Conversations</h2>
+        </div>
+        <div class="conversations-list">
+            {% if recent_conversations %}
+                {% for conversation in recent_conversations %}
+                    <div class="conversation-card">
+                        <div class="conversation-avatar">
+                            <img src="{{ conversation.avatar.image_url or url_for('static', filename='images/default-avatar.svg') }}" 
+                                 alt="{{ conversation.avatar.name }}"
+                                 class="avatar-image-small">
+                        </div>
+                        <div class="conversation-info">
+                            <h3 class="conversation-title">{{ conversation.avatar.name }}</h3>
+                            <p class="conversation-preview">{{ conversation.last_message[:100] if conversation.last_message else 'No messages yet' }}...</p>
+                            <span class="conversation-time">{{ conversation.last_message_at.strftime('%B %d, %Y') }}</span>
+                        </div>
+                        <div class="conversation-actions">
+                            <a href="{{ url_for('conversation.view', conversation_id=conversation.id) }}" class="button secondary">
+                                Continue
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-comments fa-3x"></i>
+                    <h3>No Conversations Yet</h3>
+                    <p>Start chatting with one of your avatars!</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %} 
