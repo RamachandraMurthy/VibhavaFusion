@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Home - {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="welcome-section">
+    <h1>Welcome to {{ config.APP_NAME }}</h1>
+    <p class="lead">
+        This is a modular Flask application template designed for efficient development
+        and easy maintenance.
+    </p>
+    
+    <div class="features">
+        <h2>Template Features</h2>
+        <ul>
+            <li>Modular project structure</li>
+            <li>Configuration management</li>
+            <li>Persistent storage system</li>
+            <li>Central styling with modern CSS</li>
+            <li>Responsive design</li>
+        </ul>
+    </div>
+    
+    <div class="visit-counter">
+        <p>You've visited this page {{ visit_count }} time{% if visit_count != 1 %}s{% endif %}!</p>
+    </div>
+    
+    <div class="getting-started">
+        <h2>Getting Started</h2>
+        <p>
+            To start developing your application:
+        </p>
+        <ol>
+            <li>Modify the configuration in <code>config/config.py</code></li>
+            <li>Add your routes in the <code>app/routes/</code> directory</li>
+            <li>Create templates in <code>app/templates/</code></li>
+            <li>Add styles to <code>app/static/css/styles.css</code></li>
+        </ol>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    /* Page-specific styles */
+    .welcome-section {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 0;
+    }
+    
+    .lead {
+        font-size: 1.25rem;
+        color: var(--secondary-color);
+        margin-bottom: 2rem;
+    }
+    
+    .features {
+        margin: 2rem 0;
+        padding: 2rem;
+        background-color: var(--light-color);
+        border-radius: 8px;
+    }
+    
+    .features h2 {
+        margin-bottom: 1rem;
+    }
+    
+    .features ul {
+        list-style-position: inside;
+        margin-left: 1rem;
+    }
+    
+    .features li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .visit-counter {
+        text-align: center;
+        margin: 2rem 0;
+        padding: 1rem;
+        background-color: var(--info-color);
+        color: white;
+        border-radius: 8px;
+    }
+    
+    .getting-started {
+        margin: 2rem 0;
+    }
+    
+    .getting-started h2 {
+        margin-bottom: 1rem;
+    }
+    
+    .getting-started ol {
+        list-style-position: inside;
+        margin-left: 1rem;
+    }
+    
+    .getting-started li {
+        margin-bottom: 0.5rem;
+    }
+    
+    code {
+        background-color: var(--light-color);
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-family: monospace;
+    }
+</style>
+{% endblock %} 

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}500 - Internal Server Error{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <h1>500 - Internal Server Error</h1>
+    <p>Something went wrong on our end. Please try again later.</p>
+    <a href="{{ url_for('main.index') }}" class="btn btn-primary">Return to Home</a>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .error-page {
+        text-align: center;
+        padding: 4rem 0;
+    }
+    
+    .error-page h1 {
+        color: var(--danger-color);
+        margin-bottom: 1rem;
+    }
+    
+    .error-page p {
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %} 

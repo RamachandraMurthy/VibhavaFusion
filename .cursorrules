@@ -1,0 +1,32 @@
+{
+  "projectGuidelines": {
+    "structure": [
+      "All code must follow a modular structure with clear separation of concerns between routes, views, models, and utilities.",
+      "Each new page or component must integrate into the central application framework rather than duplicating existing functionality."
+    ],
+    "styling": [
+      "All generated pages must inherit from a base template (e.g., base.html) that includes a link to the centralized stylesheet (e.g., styles.css).",
+      "No inline styling is permitted; update and maintain styling exclusively in the central CSS file.",
+      "Ensure that responsive design principles are applied consistently across all pages."
+    ],
+    "configuration": [
+      "All application settings must be managed in a dedicated configuration file (e.g., config.py) located in the /config directory.",
+      "Separate environment-specific settings (development, testing, production) clearly within the configuration module.",
+      "Sensitive configuration values (such as secret keys or database URIs) should be loaded from secure sources such as environment variables."
+    ],
+    "persistentStorage": [
+      "Persistent values and user-defined settings must be managed through a dedicated module (e.g., persistent.py) located in a central directory.",
+      "All runtime updates to persistent values should be captured by this module and made accessible to all parts of the application."
+    ],
+    "documentation": [
+      "Every generated file must include a header comment detailing the file’s purpose, its role in the overall architecture, and any relevant dependencies.",
+      "Maintain a changelog or progress log (e.g., Progress.txt) to record all modifications, including a brief summary of user instructions that led to changes.",
+      "Keep an Instructions log (e.g., Instructions.txt) that appends every new prompt, separated by a delimiter such as '--'."
+    ]
+  },
+  "rulesForAgent": {
+    "initialInstructions": "Before generating any new code, review the project guidelines specified in the 'projectGuidelines' section. Ensure that all new pages or modules conform to these rules without creating duplicate functionality.",
+    "enforcement": "If similar functionality exists (such as central styling or configuration modules), integrate with the existing code rather than generating new, conflicting code blocks."
+  },
+  "notepadReference": "Always refer to the 'ProjectGuidelines Notepad' for extended instructions, examples, and any updates to these rules. This notepad is the authoritative source for project-specific context."
+}

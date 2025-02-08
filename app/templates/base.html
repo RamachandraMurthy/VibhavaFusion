@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ config.APP_NAME }}{% endblock %}</title>
+    
+    <!-- Central stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    
+    <!-- Page-specific styles block -->
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    <header>
+        <nav class="main-nav">
+            <div class="nav-brand">
+                <a href="{{ url_for('main.index') }}">{{ config.APP_NAME }}</a>
+            </div>
+            <div class="nav-links">
+                {% block nav_links %}
+                <a href="{{ url_for('main.index') }}" class="nav-link">Home</a>
+                {% endblock %}
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; {{ config.APP_NAME }} {{ now().year }}</p>
+        </div>
+    </footer>
+
+    <!-- Page-specific scripts block -->
+    {% block scripts %}{% endblock %}
+</body>
+</html> 
