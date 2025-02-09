@@ -1,126 +1,489 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - {{ current_user.username }}{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
-    <!-- Welcome Section -->
-    <section class="dashboard-header">
-        <div class="profile-header-content">
-            <img src="{{ profile.avatar_url or url_for('static', filename='images/default-avatar.svg') }}" 
-                 alt="Profile Picture" 
-                 class="profile-avatar">
-            <div class="profile-info">
-                <h1 class="profile-name">Welcome back, {{ current_user.username }}!</h1>
-                <div class="profile-metadata">
-                    <span class="profile-metadata-item">
-                        <i class="fas fa-robot"></i>
-                        {{ avatars|length }} Avatar{{ 's' if avatars|length != 1 }}
-                    </span>
-                    <span class="profile-metadata-item">
-                        <i class="fas fa-comments"></i>
-                        {{ recent_conversations|length }} Recent Conversation{{ 's' if recent_conversations|length != 1 }}
-                    </span>
-                </div>
+<div class="dashboard">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1 class="page-title">Welcome, {{ current_user.username }}!</h1>
+            </div>
+            <div class="header-right">
+                <a href="{{ url_for('profile.manage_preferences') }}" class="button secondary">
+                    <i class="fas fa-cog"></i>
+                    Preferences
+                </a>
+                <a href="{{ url_for('avatar.create') }}" class="button primary">
+                    <i class="fas fa-plus"></i>
+                    Create Avatar
+                </a>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Quick Actions -->
-    <section class="dashboard-section">
-        <div class="section-header">
-            <h2 class="section-title">Quick Actions</h2>
-        </div>
-        <div class="quick-actions">
-            <a href="{{ url_for('avatar.create') }}" class="button primary">
-                <i class="fas fa-plus"></i>
-                Create New Avatar
-            </a>
-            <a href="{{ url_for('profile.edit_profile') }}" class="button secondary">
-                <i class="fas fa-user-edit"></i>
-                Edit Profile
-            </a>
-            <a href="{{ url_for('profile.preferences') }}" class="button secondary">
-                <i class="fas fa-cog"></i>
-                Preferences
-            </a>
-        </div>
-    </section>
-
-    <!-- Avatars Grid -->
-    <section class="dashboard-section">
-        <div class="section-header">
-            <h2 class="section-title">Your Avatars</h2>
-        </div>
-        <div class="avatars-grid">
-            {% if avatars %}
-                {% for avatar in avatars %}
-                    <div class="avatar-card">
-                        <img src="{{ avatar.image_url or url_for('static', filename='images/default-avatar.svg') }}" 
-                             alt="{{ avatar.name }}"
-                             class="avatar-image">
-                        <div class="avatar-info">
-                            <h3 class="avatar-name">{{ avatar.name }}</h3>
-                            <p class="avatar-description">{{ avatar.description[:100] }}...</p>
-                        </div>
-                        <div class="avatar-actions">
-                            <a href="{{ url_for('conversation.start', avatar_id=avatar.id) }}" class="button primary">
-                                Chat Now
-                            </a>
-                        </div>
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+        <!-- Avatars Section -->
+        <div class="card avatars-card">
+            <div class="card-header">
+                <h2 class="card-title">Your AI Companions</h2>
+            </div>
+            <div class="card-body">
+                {% if avatars %}
+                    <div class="avatar-grid">
+                        {% for avatar in avatars %}
+                            <div class="avatar-card">
+                                <div class="avatar-header">
+                                    <img src="{{ avatar.image_url or url_for('static', filename='images/default-avatar.svg') }}" 
+                                         alt="{{ avatar.name }}"
+                                         class="avatar-image">
+                                    <div class="avatar-status {% if avatar.is_active %}active{% endif %}"></div>
+                                </div>
+                                <div class="avatar-info">
+                                    <div class="avatar-name-section">
+                                        <h3 title="{{ avatar.name }}">{{ avatar.name }}</h3>
+                                        <span class="avatar-type">AI</span>
+                                    </div>
+                                    <div class="avatar-traits">
+                                        {% if avatar.personality_traits %}
+                                            {% if avatar.personality_traits.traits %}
+                                                {% for trait in avatar.personality_traits.traits|slice(2) %}
+                                                    <span class="trait-tag">{{ trait }}</span>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="avatar-focus">
+                                        {% if avatar.personality_traits and avatar.personality_traits.interests %}
+                                            <i class="fas fa-lightbulb"></i>
+                                            {{ avatar.personality_traits.interests|join(', ') }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="avatar-stats">
+                                        <span class="stat">
+                                            <i class="fas fa-clock"></i>
+                                            {% if avatar.created_at %}
+                                                {{ avatar.created_at.strftime('%b %d') }}
+                                            {% else %}
+                                                New
+                                            {% endif %}
+                                        </span>
+                                        <span class="stat">
+                                            <i class="fas fa-comments"></i>
+                                            {{ avatar.conversations.count() }}
+                                        </span>
+                                    </div>
+                                    <div class="avatar-actions">
+                                        <a href="{{ url_for('conversation.start', avatar_id=avatar.id) }}" 
+                                           class="button primary">
+                                            <i class="fas fa-comment"></i>
+                                            Chat Now
+                                        </a>
+                                        <a href="{{ url_for('avatar.edit', avatar_id=avatar.id) }}" 
+                                           class="button secondary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                            <span>Edit</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
-                {% endfor %}
-            {% else %}
-                <div class="empty-state">
-                    <i class="fas fa-robot fa-3x"></i>
-                    <h3>No Avatars Yet</h3>
-                    <p>Create your first AI avatar to start chatting!</p>
-                    <a href="{{ url_for('avatar.create') }}" class="button primary">
-                        Create Avatar
-                    </a>
-                </div>
-            {% endif %}
-        </div>
-    </section>
-
-    <!-- Recent Conversations -->
-    <section class="dashboard-section">
-        <div class="section-header">
-            <h2 class="section-title">Recent Conversations</h2>
-        </div>
-        <div class="conversations-list">
-            {% if recent_conversations %}
-                {% for conversation in recent_conversations %}
-                    <div class="conversation-card">
-                        <div class="conversation-avatar">
-                            <img src="{{ conversation.avatar.image_url or url_for('static', filename='images/default-avatar.svg') }}" 
-                                 alt="{{ conversation.avatar.name }}"
-                                 class="avatar-image-small">
-                        </div>
-                        <div class="conversation-info">
-                            <h3 class="conversation-title">{{ conversation.avatar.name }}</h3>
-                            <p class="conversation-preview">{{ conversation.last_message[:100] if conversation.last_message else 'No messages yet' }}...</p>
-                            <span class="conversation-time">{{ conversation.last_message_at.strftime('%B %d, %Y') }}</span>
-                        </div>
-                        <div class="conversation-actions">
-                            <a href="{{ url_for('conversation.view', conversation_id=conversation.id) }}" class="button secondary">
-                                Continue
-                            </a>
-                        </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-robot fa-3x"></i>
+                        <h3>No Avatars Yet</h3>
+                        <p>Create your first AI avatar to start chatting!</p>
+                        <a href="{{ url_for('avatar.create') }}" class="button primary">
+                            <i class="fas fa-plus"></i>
+                            Create Avatar
+                        </a>
                     </div>
-                {% endfor %}
-            {% else %}
-                <div class="empty-state">
-                    <i class="fas fa-comments fa-3x"></i>
-                    <h3>No Conversations Yet</h3>
-                    <p>Start chatting with one of your avatars!</p>
-                </div>
-            {% endif %}
+                {% endif %}
+            </div>
         </div>
-    </section>
+
+        <!-- Recent Activity Section -->
+        <div class="card activity-card">
+            <div class="card-header">
+                <h2 class="card-title">Recent Interactions</h2>
+            </div>
+            <div class="card-body">
+                {% if recent_conversations %}
+                    <div class="conversation-list">
+                        {% for conversation in recent_conversations %}
+                            <div class="conversation-item">
+                                <div class="conversation-avatar">
+                                    <img src="{{ conversation.avatar.image_url or url_for('static', filename='images/default-avatar.svg') }}" 
+                                         alt="{{ conversation.avatar.name }}"
+                                         class="avatar-image-small">
+                                </div>
+                                <div class="conversation-info">
+                                    <div class="conversation-header">
+                                        <h4>{{ conversation.avatar.name }}</h4>
+                                        <span class="conversation-type">
+                                            {% if conversation.avatar.personality_traits and conversation.avatar.personality_traits.communication_style %}
+                                                {{ conversation.avatar.personality_traits.communication_style|title }} Discussion
+                                            {% else %}
+                                                General Chat
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="conversation-meta">
+                                        <span class="meta-item">
+                                            <i class="fas fa-clock"></i>
+                                            {% if conversation.last_message_at %}
+                                                {{ conversation.last_message_at.strftime('%b %d, %I:%M %p') }}
+                                            {% else %}
+                                                No messages yet
+                                            {% endif %}
+                                        </span>
+                                        <span class="meta-item">
+                                            <i class="fas fa-comments"></i>
+                                            {{ conversation.messages.count() }} messages
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="conversation-actions">
+                                    <a href="{{ url_for('conversation.view', conversation_id=conversation.id) }}" 
+                                       class="button secondary">
+                                        <i class="fas fa-arrow-right"></i>
+                                        Continue
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-comments fa-3x"></i>
+                        <h3>No Recent Interactions</h3>
+                        <p>Start chatting with one of your AI companions!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+<style>
+.dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+.dashboard-header {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-right {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+}
+
+.card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-title {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.avatar-card {
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    background: white;
+}
+
+.avatar-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.avatar-header {
+    position: relative;
+    height: 60px;
+    background: linear-gradient(to right, var(--primary-color), #4a90e2);
+    padding: 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.avatar-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.avatar-status {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 3rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #9ca3af;
+    border: 2px solid white;
+}
+
+.avatar-status.active {
+    background: #10b981;
+}
+
+.avatar-info {
+    padding: 0.75rem;
+}
+
+.avatar-name-section {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.avatar-name-section h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.avatar-type {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.avatar-traits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+    min-height: 24px;
+}
+
+.trait-tag {
+    display: inline-block;
+    background: rgba(var(--primary-rgb), 0.1);
+    color: var(--primary-color);
+    padding: 0.15rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.7rem;
+    border: 1px solid rgba(var(--primary-rgb), 0.2);
+}
+
+.avatar-focus {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.focus-label {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.avatar-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.avatar-actions {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+}
+
+.avatar-actions .button {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.avatar-actions .button.secondary {
+    padding: 0.5rem;
+    width: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-actions .button.secondary span {
+    display: none;
+}
+
+.conversation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.conversation-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    transition: background-color 0.2s;
+}
+
+.conversation-item:hover {
+    background: var(--background-color);
+}
+
+.avatar-image-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.conversation-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.conversation-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.conversation-header h4 {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.conversation-type {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.conversation-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+}
+
+.empty-state i {
+    margin-bottom: 1rem;
+    color: var(--border-color);
+}
+
+.empty-state h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.empty-state p {
+    margin: 0 0 1.5rem 0;
+    font-size: 0.875rem;
+}
+
+@media (max-width: 1024px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard {
+        padding: 1rem;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .header-right {
+        justify-content: center;
+    }
+    
+    .avatar-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
 {% endblock %} 
