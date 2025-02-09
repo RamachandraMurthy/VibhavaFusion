@@ -6,7 +6,7 @@ This module handles avatar creation, customization, and interaction.
 
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from flask_login import login_required, current_user
-from app.models import db
+from app import db
 from app.models.avatar import Avatar
 from app.models.conversation import Conversation
 
@@ -37,6 +37,33 @@ def create():
         return redirect(url_for('avatar.customize', avatar_id=avatar.id))
     
     return render_template('avatar/create.html')
+
+@bp.route('/<int:avatar_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit(avatar_id):
+    avatar = Avatar.query.get_or_404(avatar_id)
+    
+    if avatar.user_id != current_user.id:
+        flash('Access denied.', 'error')
+        return redirect(url_for('main.index'))
+    
+    if request.method == 'POST':
+        name = request.form.get('name')
+        personality = {
+            'traits': request.form.getlist('traits'),
+            'interests': request.form.getlist('interests'),
+            'communication_style': request.form.get('communication_style'),
+            'knowledge_focus': request.form.getlist('knowledge_focus')
+        }
+        
+        avatar.name = name
+        avatar.personality_traits = personality
+        db.session.commit()
+        
+        flash(f'Avatar {name} updated successfully!', 'success')
+        return redirect(url_for('dashboard.index'))
+    
+    return render_template('avatar/edit.html', avatar=avatar)
 
 @bp.route('/<int:avatar_id>/customize', methods=['GET', 'POST'])
 @login_required

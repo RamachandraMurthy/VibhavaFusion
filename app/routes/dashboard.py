@@ -21,7 +21,7 @@ from app.models.profile import Profile
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
-@dashboard_bp.route('/dashboard')
+@dashboard_bp.route('/')
 @login_required
 def index():
     """Display the user's dashboard with their avatars and recent activity."""

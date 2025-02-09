@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Customize {{ avatar.name }}{% endblock %}
+
+{% block content %}
+<div class="customize-avatar-container">
+    <div class="card">
+        <div class="card-header">
+            <h1>Customize {{ avatar.name }}</h1>
+            <p class="subtitle">Fine-tune your avatar's behavior and preferences</p>
+        </div>
+        <div class="card-body">
+            <form method="POST" class="customize-form">
+                <div class="form-group">
+                    <label for="learning_style">Learning Style</label>
+                    <select id="learning_style" name="learning_style" required class="form-control">
+                        <option value="visual">Visual Learning</option>
+                        <option value="auditory">Auditory Learning</option>
+                        <option value="kinesthetic">Hands-on Learning</option>
+                        <option value="reading">Reading/Writing</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="response_length">Response Length</label>
+                    <select id="response_length" name="response_length" required class="form-control">
+                        <option value="concise">Concise (1-2 sentences)</option>
+                        <option value="moderate">Moderate (3-4 sentences)</option>
+                        <option value="detailed">Detailed (5+ sentences)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="formality_level">Communication Formality</label>
+                    <select id="formality_level" name="formality_level" required class="form-control">
+                        <option value="casual">Casual and Friendly</option>
+                        <option value="balanced">Balanced</option>
+                        <option value="formal">Formal and Professional</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Preferred Topics</label>
+                    <div class="topics-container">
+                        <div class="topic-option">
+                            <input type="checkbox" name="preferred_topics" value="technology" id="topic-tech">
+                            <label for="topic-tech">Technology</label>
+                        </div>
+                        <div class="topic-option">
+                            <input type="checkbox" name="preferred_topics" value="science" id="topic-science">
+                            <label for="topic-science">Science</label>
+                        </div>
+                        <div class="topic-option">
+                            <input type="checkbox" name="preferred_topics" value="arts" id="topic-arts">
+                            <label for="topic-arts">Arts</label>
+                        </div>
+                        <div class="topic-option">
+                            <input type="checkbox" name="preferred_topics" value="philosophy" id="topic-philosophy">
+                            <label for="topic-philosophy">Philosophy</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="interaction_frequency">Interaction Frequency</label>
+                    <select id="interaction_frequency" name="interaction_frequency" required class="form-control">
+                        <option value="frequent">Frequent (Multiple times per day)</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="feedback_style">Feedback Style</label>
+                    <select id="feedback_style" name="feedback_style" required class="form-control">
+                        <option value="encouraging">Encouraging and Supportive</option>
+                        <option value="direct">Direct and Straightforward</option>
+                        <option value="socratic">Socratic and Questioning</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="button primary">Save Preferences</button>
+                    <a href="{{ url_for('dashboard.index') }}" class="button secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.customize-avatar-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    padding: 2rem;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.card-header h1 {
+    margin: 0;
+    color: #333;
+    font-size: 2rem;
+}
+
+.subtitle {
+    color: #666;
+    margin-top: 0.5rem;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.topics-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.topic-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+}
+
+.button.primary {
+    background: #007bff;
+    color: white;
+}
+
+.button.secondary {
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.button:hover {
+    opacity: 0.9;
+}
+</style>
+{% endblock %} 

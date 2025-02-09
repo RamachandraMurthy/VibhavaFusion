@@ -3,82 +3,112 @@
 {% block title %}Chat with {{ avatar.name }}{% endblock %}
 
 {% block content %}
-<div class="conversation-container">
-    <div class="conversation-header">
-        <div class="avatar-info">
-            <img src="{{ avatar.image_url or url_for('static', filename='images/default-avatar.svg') }}" 
-                 alt="{{ avatar.name }}"
-                 class="avatar-image-small">
-            <div class="avatar-details">
-                <h1 class="avatar-name">{{ avatar.name }}</h1>
-                <p class="avatar-status">Online</p>
-            </div>
-        </div>
-        <div class="conversation-actions">
-            <a href="{{ url_for('dashboard.index') }}" class="button secondary">
-                <i class="fas fa-arrow-left"></i>
-                Back to Dashboard
-            </a>
-        </div>
-    </div>
-
-    <div class="messages-container">
-        {% if conversation.messages.all() %}
-            {% for message in conversation.messages %}
-                <div class="message {{ 'user-message' if message.is_user else 'avatar-message' }}">
-                    <div class="message-content">
-                        {{ message.content }}
-                    </div>
-                    <div class="message-time">
-                        {{ message.created_at.strftime('%I:%M %p') }}
+<div class="chat-dashboard">
+    <!-- Header Section -->
+    <div class="chat-dashboard-header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="avatar-info">
+                    <img src="{{ avatar.image_url or url_for('static', filename='images/default-avatar.svg') }}" 
+                         alt="{{ avatar.name }}"
+                         class="avatar-image-small">
+                    <div class="avatar-details">
+                        <h1 class="page-title">{{ avatar.name }}</h1>
+                        <div class="status-badge success">
+                            <i class="fas fa-circle"></i>
+                            <span>Online</span>
+                        </div>
                     </div>
                 </div>
-            {% endfor %}
-        {% else %}
-            <div class="empty-state">
-                <i class="fas fa-comments fa-3x"></i>
-                <h3>Start the Conversation</h3>
-                <p>Say hello to {{ avatar.name }}!</p>
             </div>
-        {% endif %}
+            <div class="header-right">
+                <a href="{{ url_for('dashboard.index') }}" class="button secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
     </div>
 
-    <form class="message-form" method="POST" action="{{ url_for('conversation.send_message', conversation_id=conversation.id) }}">
-        <div class="message-input-container">
-            <input type="text" 
-                   name="message" 
-                   class="message-input" 
-                   placeholder="Type your message..."
-                   autocomplete="off"
-                   required>
-            <button type="submit" class="button primary send-button">
-                <i class="fas fa-paper-plane"></i>
-                Send
-            </button>
+    <!-- Chat Content -->
+    <div class="content-grid">
+        <div class="card chat-card">
+            <div class="card-body messages-container" id="messages">
+                {% if conversation.messages.all() %}
+                    {% for message in conversation.messages %}
+                        <div class="message {{ 'user-message' if message.is_user else 'avatar-message' }}">
+                            <div class="message-content">
+                                {{ message.content }}
+                            </div>
+                            <div class="message-metadata">
+                                <span class="message-time">
+                                    <i class="fas fa-clock"></i>
+                                    {{ message.created_at.strftime('%I:%M %p') }}
+                                </span>
+                                {% if not message.is_user and message.message_data %}
+                                    <span class="message-tokens">
+                                        <i class="fas fa-coins"></i>
+                                        {{ message.message_data.tokens }} tokens
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-comments fa-3x"></i>
+                        <h3>Start the Conversation</h3>
+                        <p>Say hello to {{ avatar.name }}!</p>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <form class="message-form" id="messageForm" method="POST" action="{{ url_for('conversation.send_message', conversation_id=conversation.id) }}">
+                    <div class="message-input-container">
+                        <input type="text" 
+                               name="message" 
+                               class="message-input" 
+                               placeholder="Type your message..."
+                               autocomplete="off"
+                               required>
+                        <button type="submit" class="button primary send-button">
+                            <i class="fas fa-paper-plane"></i>
+                            Send
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </form>
+    </div>
 </div>
 {% endblock %}
 
 {% block styles %}
 <style>
-.conversation-container {
-    max-width: 1000px;
+.chat-dashboard {
+    max-width: 1200px;
     margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 200px);
+    padding: 1.5rem;
 }
 
-.conversation-header {
-    background: var(--white);
-    padding: 1rem;
+.chat-dashboard-header {
+    background: white;
     border-radius: 1rem;
-    margin-bottom: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
 }
 
 .avatar-info {
@@ -87,24 +117,32 @@
     gap: 1rem;
 }
 
+.avatar-image-small {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
 .avatar-details {
     display: flex;
     flex-direction: column;
+    gap: 0.5rem;
 }
 
-.avatar-status {
-    color: var(--success-color);
-    font-size: 0.875rem;
+.chat-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: calc(100vh - 300px);
+    display: flex;
+    flex-direction: column;
 }
 
 .messages-container {
     flex: 1;
     overflow-y: auto;
-    padding: 1rem;
-    background: var(--white);
-    border-radius: 1rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
 }
 
 .message {
@@ -112,6 +150,7 @@
     margin-bottom: 1rem;
     padding: 1rem;
     border-radius: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .user-message {
@@ -124,19 +163,30 @@
     margin-right: auto;
     background: var(--background-color);
     color: var(--text-color);
+    border: 1px solid var(--border-color);
 }
 
-.message-time {
+.message-metadata {
+    display: flex;
+    gap: 1rem;
     font-size: 0.75rem;
+    margin-top: 0.5rem;
     opacity: 0.8;
-    margin-top: 0.25rem;
+}
+
+.message-time, .message-tokens {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.card-footer {
+    padding: 1rem 1.5rem;
+    border-top: 2px solid var(--border-color);
 }
 
 .message-form {
-    background: var(--white);
-    padding: 1rem;
-    border-radius: 1rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    width: 100%;
 }
 
 .message-input-container {
@@ -150,34 +200,139 @@
     border: 1px solid var(--border-color);
     border-radius: 0.5rem;
     font-size: 1rem;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
 }
 
 .message-input:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.1);
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
 }
 
 .send-button {
     padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+}
+
+.empty-state i {
+    color: var(--border-color);
+    margin-bottom: 1rem;
 }
 
 @media (max-width: 768px) {
-    .conversation-container {
-        height: calc(100vh - 150px);
-        margin: 0;
+    .chat-dashboard {
+        padding: 1rem;
     }
-    
-    .conversation-header {
+
+    .header-content {
         flex-direction: column;
         gap: 1rem;
-        text-align: center;
     }
     
     .message {
         max-width: 85%;
     }
+    
+    .chat-card {
+        height: calc(100vh - 250px);
+    }
 }
 </style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const messagesContainer = document.getElementById('messages');
+    const messageForm = document.getElementById('messageForm');
+    
+    // Scroll to bottom of messages
+    function scrollToBottom() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    // Initial scroll
+    scrollToBottom();
+    
+    // Handle form submission
+    messageForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const submitButton = this.querySelector('button[type="submit"]');
+        
+        try {
+            // Disable submit button and show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            
+            // Send message
+            const response = await fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'message user-message';
+                userMessage.innerHTML = `
+                    <div class="message-content">${formData.get('message')}</div>
+                    <div class="message-metadata">
+                        <span class="message-time">
+                            <i class="fas fa-clock"></i>
+                            ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                        </span>
+                    </div>
+                `;
+                messagesContainer.appendChild(userMessage);
+                
+                // Add AI response
+                const aiMessage = document.createElement('div');
+                aiMessage.className = 'message avatar-message';
+                aiMessage.innerHTML = `
+                    <div class="message-content">${result.message.content}</div>
+                    <div class="message-metadata">
+                        <span class="message-time">
+                            <i class="fas fa-clock"></i>
+                            ${new Date(result.message.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                        </span>
+                        <span class="message-tokens">
+                            <i class="fas fa-coins"></i>
+                            ${result.message.message_data.tokens} tokens
+                        </span>
+                    </div>
+                `;
+                messagesContainer.appendChild(aiMessage);
+                
+                // Clear input and scroll to bottom
+                this.reset();
+                scrollToBottom();
+            } else {
+                throw new Error(result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error sending message. Please try again.');
+        } finally {
+            // Reset submit button
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+        }
+    });
+});
+</script>
 {% endblock %} 

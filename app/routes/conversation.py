@@ -13,10 +13,11 @@ Dependencies:
     - Models: Avatar and Conversation models
 """
 
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
 from app.models.avatar import Avatar
 from app.models.conversation import Conversation, Message
+from app.services.ai_service import ai_service
 from app import db
 
 conversation_bp = Blueprint('conversation', __name__)
@@ -73,25 +74,78 @@ def send_message(conversation_id):
         flash('Message cannot be empty.', 'error')
         return redirect(url_for('conversation.view', conversation_id=conversation_id))
     
-    # Add user message
-    message = Message(
-        conversation_id=conversation_id,
-        content=message_content,
-        is_user=True
-    )
-    db.session.add(message)
-    
-    # TODO: Generate AI response using OpenAI
-    # For now, just echo back a simple response
-    ai_response = Message(
-        conversation_id=conversation_id,
-        content=f"You said: {message_content}",
-        is_user=False
-    )
-    db.session.add(ai_response)
-    
-    # Update conversation timestamp
-    conversation.last_message_at = message.created_at
-    db.session.commit()
+    try:
+        # Add user message
+        user_message = Message(
+            conversation_id=conversation_id,
+            content=message_content,
+            is_user=True
+        )
+        db.session.add(user_message)
+        
+        # Prepare conversation history for context
+        recent_messages = conversation.get_recent_messages(5)  # Get last 5 messages
+        messages = []
+        
+        # Add system message with avatar personality
+        avatar = conversation.avatar
+        system_message = {
+            'role': 'system',
+            'content': f"You are {avatar.name}, {avatar.personality}. Respond in character."
+        }
+        messages.append(system_message)
+        
+        # Add conversation history
+        for msg in reversed(recent_messages):
+            role = 'user' if msg.is_user else 'assistant'
+            messages.append({
+                'role': role,
+                'content': msg.content
+            })
+        
+        # Add current message
+        messages.append({
+            'role': 'user',
+            'content': message_content
+        })
+        
+        # Get AI response
+        response = ai_service.generate_chat_response(
+            messages,
+            context=conversation.context
+        )
+        
+        # Extract and save AI response
+        ai_message_content = response['choices'][0]['message']['content']
+        ai_message = Message(
+            conversation_id=conversation_id,
+            content=ai_message_content,
+            is_user=False,
+            message_data={
+                'tokens': response.get('usage', {}).get('total_tokens', 0),
+                'model': response.get('model', '')
+            }
+        )
+        db.session.add(ai_message)
+        
+        # Update conversation timestamp
+        conversation.last_message_at = ai_message.created_at
+        db.session.commit()
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({
+                'status': 'success',
+                'message': ai_message.to_dict()
+            })
+            
+    except Exception as e:
+        db.session.rollback()
+        error_msg = f"Error processing message: {str(e)}"
+        flash(error_msg, 'error')
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({
+                'status': 'error',
+                'message': error_msg
+            }), 500
     
     return redirect(url_for('conversation.view', conversation_id=conversation_id)) 

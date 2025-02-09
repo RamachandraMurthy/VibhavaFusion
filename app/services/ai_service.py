@@ -112,5 +112,66 @@ class AIService:
         # Log to application logger as well
         logging.error(f"AI Service Error - {error_type}: {message}")
 
+    def generate_chat_response(self, messages, context=None):
+        """Generate a chat response using the OpenAI API.
+        
+        Args:
+            messages (list): List of message dictionaries with 'role' and 'content'
+            context (dict, optional): Additional context for the conversation
+            
+        Returns:
+            dict: The API response containing the generated message
+        """
+        try:
+            # Prepare the API request
+            headers = self.config.headers
+            data = {
+                'model': self.config.text_model,
+                'messages': messages,
+                'max_tokens': self.config.max_output_tokens,
+                'temperature': 0.7,
+                'top_p': 1.0,
+                'frequency_penalty': 0.0,
+                'presence_penalty': 0.0
+            }
+            
+            # Add context if provided
+            if context:
+                system_message = messages[0] if messages and messages[0]['role'] == 'system' else None
+                if system_message:
+                    system_message['content'] += f"\nContext: {json.dumps(context)}"
+                else:
+                    messages.insert(0, {
+                        'role': 'system',
+                        'content': f"Context: {json.dumps(context)}"
+                    })
+                data['messages'] = messages
+            
+            # Make the API call
+            response = requests.post(
+                'https://api.openai.com/v1/chat/completions',
+                headers=headers,
+                json=data
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                # Log the request
+                self.log_request(
+                    'chat_completion',
+                    tokens=result.get('usage', {}).get('total_tokens', 0),
+                    metadata={'model': self.config.text_model}
+                )
+                return result
+            else:
+                error_msg = f"OpenAI API error: {response.status_code} - {response.text}"
+                self.log_error('api_error', error_msg)
+                raise Exception(error_msg)
+                
+        except Exception as e:
+            error_msg = f"Error generating chat response: {str(e)}"
+            self.log_error('chat_error', error_msg)
+            raise
+
 # Create a singleton instance
 ai_service = AIService() 

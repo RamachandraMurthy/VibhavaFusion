@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Create Avatar{% endblock %}
+
+{% block content %}
+<div class="create-avatar-container">
+    <div class="card">
+        <div class="card-header">
+            <h1>Create Your AI Avatar</h1>
+            <p class="subtitle">Design your perfect AI companion</p>
+        </div>
+        <div class="card-body">
+            <form method="POST" class="avatar-form">
+                <div class="form-group">
+                    <label for="name">Avatar Name</label>
+                    <input type="text" id="name" name="name" required 
+                           class="form-control" placeholder="Enter a name for your avatar">
+                </div>
+
+                <div class="form-group">
+                    <label>Personality Traits</label>
+                    <div class="traits-container">
+                        <div class="trait-option">
+                            <input type="checkbox" name="traits" value="friendly" id="trait-friendly">
+                            <label for="trait-friendly">Friendly</label>
+                        </div>
+                        <div class="trait-option">
+                            <input type="checkbox" name="traits" value="analytical" id="trait-analytical">
+                            <label for="trait-analytical">Analytical</label>
+                        </div>
+                        <div class="trait-option">
+                            <input type="checkbox" name="traits" value="creative" id="trait-creative">
+                            <label for="trait-creative">Creative</label>
+                        </div>
+                        <div class="trait-option">
+                            <input type="checkbox" name="traits" value="empathetic" id="trait-empathetic">
+                            <label for="trait-empathetic">Empathetic</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Areas of Interest</label>
+                    <div class="interests-container">
+                        <div class="interest-option">
+                            <input type="checkbox" name="interests" value="technology" id="interest-tech">
+                            <label for="interest-tech">Technology</label>
+                        </div>
+                        <div class="interest-option">
+                            <input type="checkbox" name="interests" value="science" id="interest-science">
+                            <label for="interest-science">Science</label>
+                        </div>
+                        <div class="interest-option">
+                            <input type="checkbox" name="interests" value="arts" id="interest-arts">
+                            <label for="interest-arts">Arts</label>
+                        </div>
+                        <div class="interest-option">
+                            <input type="checkbox" name="interests" value="philosophy" id="interest-philosophy">
+                            <label for="interest-philosophy">Philosophy</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="communication_style">Communication Style</label>
+                    <select id="communication_style" name="communication_style" required class="form-control">
+                        <option value="casual">Casual and Friendly</option>
+                        <option value="formal">Formal and Professional</option>
+                        <option value="socratic">Socratic and Inquisitive</option>
+                        <option value="direct">Direct and Concise</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Knowledge Focus</label>
+                    <div class="knowledge-container">
+                        <div class="knowledge-option">
+                            <input type="checkbox" name="knowledge_focus" value="theoretical" id="knowledge-theoretical">
+                            <label for="knowledge-theoretical">Theoretical</label>
+                        </div>
+                        <div class="knowledge-option">
+                            <input type="checkbox" name="knowledge_focus" value="practical" id="knowledge-practical">
+                            <label for="knowledge-practical">Practical</label>
+                        </div>
+                        <div class="knowledge-option">
+                            <input type="checkbox" name="knowledge_focus" value="historical" id="knowledge-historical">
+                            <label for="knowledge-historical">Historical</label>
+                        </div>
+                        <div class="knowledge-option">
+                            <input type="checkbox" name="knowledge_focus" value="current" id="knowledge-current">
+                            <label for="knowledge-current">Current Affairs</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="button primary">Create Avatar</button>
+                    <a href="{{ url_for('dashboard.index') }}" class="button secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.create-avatar-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    padding: 2rem;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.card-header h1 {
+    margin: 0;
+    color: #333;
+    font-size: 2rem;
+}
+
+.subtitle {
+    color: #666;
+    margin-top: 0.5rem;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.traits-container,
+.interests-container,
+.knowledge-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.trait-option,
+.interest-option,
+.knowledge-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+}
+
+.button.primary {
+    background: #007bff;
+    color: white;
+}
+
+.button.secondary {
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.button:hover {
+    opacity: 0.9;
+}
+</style>
+{% endblock %} 
