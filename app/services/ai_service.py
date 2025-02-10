@@ -3,7 +3,7 @@ import requests
 from datetime import datetime, timedelta
 from ..utils.ai_config import ai_config
 from flask import current_app
-import logging
+from app.utils.log_manager import log_manager
 
 class AIService:
     """Service class for handling AI operations and monitoring."""
@@ -97,20 +97,32 @@ class AIService:
             self.request_history = self.request_history[-1000:]
     
     def log_error(self, error_type, message, metadata=None):
-        """Log an error for monitoring."""
-        self.error_history.append({
+        """Log an error for monitoring.
+        
+        Args:
+            error_type (str): Type of error (e.g., 'API Error', 'Validation Error')
+            message (str): Error message
+            metadata (dict, optional): Additional error context
+        """
+        error = {
             'timestamp': datetime.now(),
             'type': error_type,
             'message': message,
             'metadata': metadata or {}
-        })
+        }
+        
+        # Add to error history
+        self.error_history.append(error)
         
         # Trim history if too long
         if len(self.error_history) > 100:
             self.error_history = self.error_history[-100:]
         
-        # Log to application logger as well
-        logging.error(f"AI Service Error - {error_type}: {message}")
+        # Log to application logger
+        log_manager.logger.error(
+            f"AI Service Error - {error_type}: {message}",
+            extra={'metadata': metadata} if metadata else None
+        )
 
     def generate_chat_response(self, messages, context=None):
         """Generate a chat response using the OpenAI API.
@@ -123,54 +135,27 @@ class AIService:
             dict: The API response containing the generated message
         """
         try:
-            # Prepare the API request
-            headers = self.config.headers
-            data = {
-                'model': self.config.text_model,
-                'messages': messages,
-                'max_tokens': self.config.max_output_tokens,
-                'temperature': 0.7,
-                'top_p': 1.0,
-                'frequency_penalty': 0.0,
-                'presence_penalty': 0.0
-            }
-            
-            # Add context if provided
-            if context:
-                system_message = messages[0] if messages and messages[0]['role'] == 'system' else None
-                if system_message:
-                    system_message['content'] += f"\nContext: {json.dumps(context)}"
-                else:
-                    messages.insert(0, {
-                        'role': 'system',
-                        'content': f"Context: {json.dumps(context)}"
-                    })
-                data['messages'] = messages
-            
-            # Make the API call
-            response = requests.post(
-                'https://api.openai.com/v1/chat/completions',
-                headers=headers,
-                json=data
+            # TODO: Implement actual API call
+            log_manager.logger.info(
+                "Generating chat response",
+                extra={
+                    'message_count': len(messages),
+                    'context': context
+                }
             )
-            
-            if response.status_code == 200:
-                result = response.json()
-                # Log the request
-                self.log_request(
-                    'chat_completion',
-                    tokens=result.get('usage', {}).get('total_tokens', 0),
-                    metadata={'model': self.config.text_model}
-                )
-                return result
-            else:
-                error_msg = f"OpenAI API error: {response.status_code} - {response.text}"
-                self.log_error('api_error', error_msg)
-                raise Exception(error_msg)
-                
+            return {
+                'role': 'assistant',
+                'content': 'This is a placeholder response.'
+            }
         except Exception as e:
-            error_msg = f"Error generating chat response: {str(e)}"
-            self.log_error('chat_error', error_msg)
+            self.log_error(
+                'API Error',
+                str(e),
+                metadata={
+                    'message_count': len(messages),
+                    'context': context
+                }
+            )
             raise
 
 # Create a singleton instance

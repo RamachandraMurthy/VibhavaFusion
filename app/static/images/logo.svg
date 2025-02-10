@@ -2,27 +2,34 @@
 <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
     <style>
         :root {
-            --logo-gradient-start: var(--primary-color, #F97316);
-            --logo-gradient-end: var(--primary-dark, #EA580C);
-            --logo-stroke: var(--surface-color, #FFFFFF);
+            --debug-bg: #FDF5E6;
+            --debug-primary: #8B4513;
+        }
+        
+        #background {
+            fill: var(--logo-bg-start, var(--debug-bg));
+        }
+        
+        .logo-element {
+            stroke: var(--logo-primary, var(--debug-primary));
+            fill: none;
         }
     </style>
     
-    <!-- Background Circle with gradient -->
     <defs>
-        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:var(--logo-gradient-start)"/>
-            <stop offset="100%" style="stop-color:var(--logo-gradient-end)"/>
+        <linearGradient id="logo_gradient" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="var(--logo-bg-start, var(--debug-bg))"/>
+            <stop offset="100%" stop-color="var(--logo-bg-end, #FFFFFF)"/>
         </linearGradient>
     </defs>
     
     <!-- Background Circle -->
-    <circle cx="20" cy="20" r="20" fill="url(#logoGradient)"/>
+    <circle id="background" cx="20" cy="20" r="20" fill="url(#logo_gradient)"/>
     
     <!-- Abstract V shape -->
-    <path d="M10 12L20 28L30 12" stroke="var(--logo-stroke)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path class="logo-element" d="M10 12L20 28L30 12" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
     
     <!-- Connecting lines representing fusion -->
-    <path d="M15 20H25" stroke="var(--logo-stroke)" stroke-width="2" stroke-linecap="round"/>
-    <path d="M13 24H27" stroke="var(--logo-stroke)" stroke-width="2" stroke-linecap="round"/>
+    <path class="logo-element" d="M15 20H25" stroke-width="2" stroke-linecap="round"/>
+    <path class="logo-element" d="M13 24H27" stroke-width="2" stroke-linecap="round"/>
 </svg> 

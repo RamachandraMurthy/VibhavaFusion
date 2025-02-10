@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block title %}Chat with {{ avatar.name }}{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-header">
+        <h1>Chat with {{ avatar.name }}</h1>
+        <p class="subtitle">Your AI companion is ready to chat</p>
+    </div>
+    
+    <div class="chat-messages" id="chat-messages">
+        {% if conversation.messages.all() %}
+            {% for message in conversation.messages.order_by('created_at').all() %}
+                <div class="message {% if message.is_user %}user-message{% else %}avatar-message{% endif %}">
+                    <div class="message-content">{{ message.content }}</div>
+                    <div class="message-time">{{ message.created_at.strftime('%I:%M %p') }}</div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-chat">
+                <p>Start your conversation with {{ avatar.name }}</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="chat-input">
+        <form id="message-form" class="message-form">
+            <input type="hidden" name="conversation_id" value="{{ conversation.id }}">
+            <div class="input-group">
+                <input type="text" 
+                       id="message-input" 
+                       name="message" 
+                       placeholder="Type your message..." 
+                       class="form-control"
+                       required>
+                <button type="submit" class="button primary">
+                    <i class="fas fa-paper-plane"></i>
+                    Send
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.chat-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 200px);
+}
+
+.chat-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.chat-header h1 {
+    color: var(--text-color);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--text-light);
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    background: var(--surface-color);
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.message {
+    max-width: 70%;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    position: relative;
+}
+
+.user-message {
+    background: var(--primary-color);
+    color: var(--surface-color);
+    align-self: flex-end;
+    border-bottom-right-radius: 0;
+}
+
+.avatar-message {
+    background: var(--background-color);
+    color: var(--text-color);
+    align-self: flex-start;
+    border-bottom-left-radius: 0;
+}
+
+.message-content {
+    margin-bottom: 0.5rem;
+}
+
+.message-time {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    text-align: right;
+}
+
+.empty-chat {
+    text-align: center;
+    color: var(--text-light);
+    padding: 2rem;
+}
+
+.chat-input {
+    background: var(--surface-color);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow-md);
+}
+
+.message-form {
+    width: 100%;
+}
+
+.input-group {
+    display: flex;
+    gap: 1rem;
+}
+
+.input-group .form-control {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    background: var(--surface-color);
+    color: var(--text-color);
+}
+
+.input-group .form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
+}
+
+.input-group .button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.input-group .button i {
+    font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+    .chat-container {
+        height: calc(100vh - 150px);
+        margin: 1rem auto;
+    }
+    
+    .message {
+        max-width: 85%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const messageForm = document.getElementById('message-form');
+    const messageInput = document.getElementById('message-input');
+    const messagesContainer = document.getElementById('chat-messages');
+    
+    // Scroll to bottom of messages
+    function scrollToBottom() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    // Initial scroll
+    scrollToBottom();
+    
+    messageForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const message = messageInput.value.trim();
+        if (!message) return;
+        
+        try {
+            const response = await fetch("{{ url_for('avatar.send_message', avatar_id=avatar.id) }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    conversation_id: {{ conversation.id }}
+                })
+            });
+            
+            if (response.ok) {
+                // Add message to chat
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message user-message';
+                messageElement.innerHTML = `
+                    <div class="message-content">${message}</div>
+                    <div class="message-time">${new Date().toLocaleTimeString([], {hour: 'numeric', minute:'2-digit'})}</div>
+                `;
+                messagesContainer.appendChild(messageElement);
+                
+                // Clear input and scroll
+                messageInput.value = '';
+                scrollToBottom();
+            } else {
+                console.error('Error sending message');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+});
+</script>
+{% endblock %} 

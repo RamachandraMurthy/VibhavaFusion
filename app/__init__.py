@@ -28,10 +28,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 from config import Config
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from app.utils.log_manager import log_manager
 
 # Initialize Flask extensions
 db = SQLAlchemy()
@@ -50,7 +47,7 @@ def not_found_error(error):
     Returns:
         tuple: Rendered 404 template and status code
     """
-    logger.error(f"404 error: {error}")
+    log_manager.logger.error(f"404 error: {error}")
     return render_template('404.html'), 404
 
 def internal_error(error):
@@ -62,7 +59,7 @@ def internal_error(error):
     Returns:
         tuple: Rendered 500 template and status code
     """
-    logger.error(f"500 error: {error}")
+    log_manager.logger.error(f"500 error: {error}")
     return render_template('500.html'), 500
 
 @login_manager.user_loader
@@ -108,6 +105,9 @@ def create_app(config_class=Config):
     from app.routes.ai_console import bp as ai_console_bp
     app.register_blueprint(ai_console_bp)
     
+    from app.routes.admin import admin_bp
+    app.register_blueprint(admin_bp, url_prefix='/admin')
+    
     # Register error handlers
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
@@ -122,11 +122,11 @@ def create_app(config_class=Config):
     # Add request logging
     @app.before_request
     def log_request_info():
-        logger.info(f"Incoming request: {request.method} {request.url}")
+        log_manager.logger.info(f"Incoming request: {request.method} {request.url}")
     
     @app.after_request
     def log_response_info(response):
-        logger.info(f"Response status: {response.status}")
+        log_manager.logger.info(f"Response status: {response.status}")
         return response
     
     @app.route('/test')

@@ -1,0 +1,311 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<div class="settings-container">
+    <div class="settings-header">
+        <h1>System Settings</h1>
+        <p class="subtitle">Configure system-wide settings and preferences</p>
+    </div>
+
+    <div class="settings-content">
+        <!-- General Settings -->
+        <section class="settings-section">
+            <h2><i class="fas fa-cog"></i> General Settings</h2>
+            <div class="settings-form">
+                <div class="form-group">
+                    <label for="site_name">Site Name</label>
+                    <input type="text" id="site_name" name="site_name" class="form-control" 
+                           value="{{ config.APP_NAME }}" placeholder="Enter site name">
+                </div>
+                <div class="form-group">
+                    <label for="site_description">Site Description</label>
+                    <textarea id="site_description" name="site_description" class="form-control" 
+                              placeholder="Enter site description" rows="3">{{ config.get('SITE_DESCRIPTION', '') }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="maintenance_mode">Maintenance Mode</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="maintenance_mode" name="maintenance_mode"
+                               {% if config.get('MAINTENANCE_MODE', false) %}checked{% endif %}>
+                        <span class="toggle-slider"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security Settings -->
+        <section class="settings-section">
+            <h2><i class="fas fa-shield-alt"></i> Security Settings</h2>
+            <div class="settings-form">
+                <div class="form-group">
+                    <label for="session_duration">Session Duration (hours)</label>
+                    <input type="number" id="session_duration" name="session_duration" class="form-control"
+                           value="{{ config.get('SESSION_DURATION', 24) }}" min="1" max="168">
+                </div>
+                <div class="form-group">
+                    <label for="max_login_attempts">Max Login Attempts</label>
+                    <input type="number" id="max_login_attempts" name="max_login_attempts" class="form-control"
+                           value="{{ config.get('MAX_LOGIN_ATTEMPTS', 5) }}" min="1" max="10">
+                </div>
+                <div class="form-group">
+                    <label for="password_policy">Password Policy</label>
+                    <select id="password_policy" name="password_policy" class="form-control">
+                        <option value="basic" {% if config.get('PASSWORD_POLICY') == 'basic' %}selected{% endif %}>Basic</option>
+                        <option value="medium" {% if config.get('PASSWORD_POLICY') == 'medium' %}selected{% endif %}>Medium</option>
+                        <option value="strong" {% if config.get('PASSWORD_POLICY') == 'strong' %}selected{% endif %}>Strong</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Email Settings -->
+        <section class="settings-section">
+            <h2><i class="fas fa-envelope"></i> Email Settings</h2>
+            <div class="settings-form">
+                <div class="form-group">
+                    <label for="smtp_host">SMTP Host</label>
+                    <input type="text" id="smtp_host" name="smtp_host" class="form-control"
+                           value="{{ config.get('SMTP_HOST', '') }}" placeholder="smtp.example.com">
+                </div>
+                <div class="form-group">
+                    <label for="smtp_port">SMTP Port</label>
+                    <input type="number" id="smtp_port" name="smtp_port" class="form-control"
+                           value="{{ config.get('SMTP_PORT', 587) }}" min="1" max="65535">
+                </div>
+                <div class="form-group">
+                    <label for="smtp_encryption">SMTP Encryption</label>
+                    <select id="smtp_encryption" name="smtp_encryption" class="form-control">
+                        <option value="none" {% if config.get('SMTP_ENCRYPTION') == 'none' %}selected{% endif %}>None</option>
+                        <option value="tls" {% if config.get('SMTP_ENCRYPTION') == 'tls' %}selected{% endif %}>TLS</option>
+                        <option value="ssl" {% if config.get('SMTP_ENCRYPTION') == 'ssl' %}selected{% endif %}>SSL</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Settings -->
+        <section class="settings-section">
+            <h2><i class="fas fa-robot"></i> AI Settings</h2>
+            <div class="settings-form">
+                <div class="form-group">
+                    <label for="openai_model">OpenAI Model</label>
+                    <select id="openai_model" name="openai_model" class="form-control">
+                        <option value="gpt-4" {% if config.get('OPENAI_MODEL') == 'gpt-4' %}selected{% endif %}>GPT-4</option>
+                        <option value="gpt-3.5-turbo" {% if config.get('OPENAI_MODEL') == 'gpt-3.5-turbo' %}selected{% endif %}>GPT-3.5 Turbo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="max_tokens">Max Tokens per Request</label>
+                    <input type="number" id="max_tokens" name="max_tokens" class="form-control"
+                           value="{{ config.get('MAX_TOKENS', 2000) }}" min="100" max="4000">
+                </div>
+                <div class="form-group">
+                    <label for="temperature">Temperature</label>
+                    <input type="range" id="temperature" name="temperature" class="form-range"
+                           value="{{ config.get('TEMPERATURE', 0.7) }}" min="0" max="1" step="0.1">
+                    <span class="range-value">{{ config.get('TEMPERATURE', 0.7) }}</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-actions">
+            <button type="button" class="button secondary" onclick="resetSettings()">Reset to Default</button>
+            <button type="button" class="button primary" onclick="saveSettings()">Save Changes</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.settings-header {
+    margin-bottom: 1rem;
+}
+
+.settings-header h1 {
+    font-size: 2rem;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.settings-section {
+    background: var(--surface-color);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.settings-section h2 {
+    font-size: 1.25rem;
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.settings-section h2 i {
+    color: var(--primary-color);
+}
+
+.settings-form {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.form-control {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    background: var(--surface-color);
+    color: var(--text-color);
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border-color);
+    transition: 0.4s;
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: var(--surface-color);
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: var(--primary-color);
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(26px);
+}
+
+.form-range {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+    outline: none;
+}
+
+.form-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.range-value {
+    font-size: 0.875rem;
+    color: var(--text-light);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 768px) {
+    .settings-section {
+        padding: 1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .button {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+// Update range value display
+document.getElementById('temperature').addEventListener('input', function(e) {
+    document.querySelector('.range-value').textContent = e.target.value;
+});
+
+function saveSettings() {
+    // TODO: Implement settings save functionality
+    alert('Settings save functionality will be implemented soon');
+}
+
+function resetSettings() {
+    if (confirm('Are you sure you want to reset all settings to their default values?')) {
+        // TODO: Implement settings reset functionality
+        alert('Settings reset functionality will be implemented soon');
+    }
+}
+</script>
+{% endblock %} 

@@ -75,23 +75,32 @@ def customize(avatar_id):
         return redirect(url_for('main.index'))
     
     if request.method == 'POST':
-        personality = avatar.get_personality()
-        personality.update({
-            'learning_style': request.form.get('learning_style'),
-            'response_length': request.form.get('response_length'),
-            'formality_level': request.form.get('formality_level')
-        })
-        
-        avatar.set_personality(personality)
-        avatar.update_learning_preferences({
-            'preferred_topics': request.form.getlist('preferred_topics'),
-            'interaction_frequency': request.form.get('interaction_frequency'),
-            'feedback_style': request.form.get('feedback_style')
-        })
-        
-        db.session.commit()
-        flash('Avatar preferences updated successfully!', 'success')
-        return redirect(url_for('avatar.chat', avatar_id=avatar.id))
+        try:
+            # Update personality settings
+            personality = avatar.get_personality()
+            personality.update({
+                'learning_style': request.form.get('learning_style'),
+                'response_length': request.form.get('response_length'),
+                'formality_level': request.form.get('formality_level')
+            })
+            avatar.set_personality(personality)
+            
+            # Update learning preferences
+            learning_prefs = {
+                'interaction_frequency': request.form.get('interaction_frequency'),
+                'feedback_style': request.form.get('feedback_style')
+            }
+            avatar.update_learning_preferences(learning_prefs)
+            
+            # Commit all changes
+            db.session.commit()
+            flash('Avatar preferences updated successfully!', 'success')
+            return redirect(url_for('dashboard.index'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash('Error updating preferences. Please try again.', 'error')
+            current_app.logger.error(f"Error updating avatar preferences: {str(e)}")
     
     return render_template('avatar/customize.html', avatar=avatar)
 

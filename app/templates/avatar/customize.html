@@ -14,68 +14,46 @@
                 <div class="form-group">
                     <label for="learning_style">Learning Style</label>
                     <select id="learning_style" name="learning_style" required class="form-control">
-                        <option value="visual">Visual Learning</option>
-                        <option value="auditory">Auditory Learning</option>
-                        <option value="kinesthetic">Hands-on Learning</option>
-                        <option value="reading">Reading/Writing</option>
+                        <option value="visual" {% if avatar.get_personality().get('learning_style') == 'visual' %}selected{% endif %}>Visual Learning</option>
+                        <option value="auditory" {% if avatar.get_personality().get('learning_style') == 'auditory' %}selected{% endif %}>Auditory Learning</option>
+                        <option value="kinesthetic" {% if avatar.get_personality().get('learning_style') == 'kinesthetic' %}selected{% endif %}>Hands-on Learning</option>
+                        <option value="reading" {% if avatar.get_personality().get('learning_style') == 'reading' %}selected{% endif %}>Reading/Writing</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="response_length">Response Length</label>
                     <select id="response_length" name="response_length" required class="form-control">
-                        <option value="concise">Concise (1-2 sentences)</option>
-                        <option value="moderate">Moderate (3-4 sentences)</option>
-                        <option value="detailed">Detailed (5+ sentences)</option>
+                        <option value="concise" {% if avatar.get_personality().get('response_length') == 'concise' %}selected{% endif %}>Concise (1-2 sentences)</option>
+                        <option value="moderate" {% if avatar.get_personality().get('response_length') == 'moderate' %}selected{% endif %}>Moderate (3-4 sentences)</option>
+                        <option value="detailed" {% if avatar.get_personality().get('response_length') == 'detailed' %}selected{% endif %}>Detailed (5+ sentences)</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="formality_level">Communication Formality</label>
+                    <label for="formality_level">Formality Level</label>
                     <select id="formality_level" name="formality_level" required class="form-control">
-                        <option value="casual">Casual and Friendly</option>
-                        <option value="balanced">Balanced</option>
-                        <option value="formal">Formal and Professional</option>
+                        <option value="casual" {% if avatar.get_personality().get('formality_level') == 'casual' %}selected{% endif %}>Casual</option>
+                        <option value="neutral" {% if avatar.get_personality().get('formality_level') == 'neutral' %}selected{% endif %}>Neutral</option>
+                        <option value="formal" {% if avatar.get_personality().get('formality_level') == 'formal' %}selected{% endif %}>Formal</option>
                     </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Preferred Topics</label>
-                    <div class="topics-container">
-                        <div class="topic-option">
-                            <input type="checkbox" name="preferred_topics" value="technology" id="topic-tech">
-                            <label for="topic-tech">Technology</label>
-                        </div>
-                        <div class="topic-option">
-                            <input type="checkbox" name="preferred_topics" value="science" id="topic-science">
-                            <label for="topic-science">Science</label>
-                        </div>
-                        <div class="topic-option">
-                            <input type="checkbox" name="preferred_topics" value="arts" id="topic-arts">
-                            <label for="topic-arts">Arts</label>
-                        </div>
-                        <div class="topic-option">
-                            <input type="checkbox" name="preferred_topics" value="philosophy" id="topic-philosophy">
-                            <label for="topic-philosophy">Philosophy</label>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="interaction_frequency">Interaction Frequency</label>
                     <select id="interaction_frequency" name="interaction_frequency" required class="form-control">
-                        <option value="frequent">Frequent (Multiple times per day)</option>
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
+                        <option value="frequent" {% if avatar.get_learning_preferences().get('interaction_frequency') == 'frequent' %}selected{% endif %}>Frequent (Multiple times per day)</option>
+                        <option value="daily" {% if avatar.get_learning_preferences().get('interaction_frequency') == 'daily' %}selected{% endif %}>Daily</option>
+                        <option value="weekly" {% if avatar.get_learning_preferences().get('interaction_frequency') == 'weekly' %}selected{% endif %}>Weekly</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="feedback_style">Feedback Style</label>
                     <select id="feedback_style" name="feedback_style" required class="form-control">
-                        <option value="encouraging">Encouraging and Supportive</option>
-                        <option value="direct">Direct and Straightforward</option>
-                        <option value="socratic">Socratic and Questioning</option>
+                        <option value="encouraging" {% if avatar.get_learning_preferences().get('feedback_style') == 'encouraging' %}selected{% endif %}>Encouraging and Supportive</option>
+                        <option value="direct" {% if avatar.get_learning_preferences().get('feedback_style') == 'direct' %}selected{% endif %}>Direct and Straightforward</option>
+                        <option value="socratic" {% if avatar.get_learning_preferences().get('feedback_style') == 'socratic' %}selected{% endif %}>Socratic and Questioning</option>
                     </select>
                 </div>
 
@@ -98,25 +76,25 @@
 }
 
 .card {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: var(--surface-color);
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow-md);
 }
 
 .card-header {
     padding: 2rem;
     text-align: center;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .card-header h1 {
     margin: 0;
-    color: #333;
+    color: var(--text-color);
     font-size: 2rem;
 }
 
 .subtitle {
-    color: #666;
+    color: var(--text-light);
     margin-top: 0.5rem;
 }
 
@@ -132,59 +110,78 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
-    color: #333;
+    color: var(--text-color);
 }
 
 .form-control {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
     font-size: 1rem;
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    transition: border-color 0.2s ease;
 }
 
-.topics-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1rem;
-    margin-top: 0.5rem;
-}
-
-.topic-option {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
 }
 
 .form-actions {
     display: flex;
     gap: 1rem;
     margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
 }
 
 .button {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
     text-decoration: none;
-    text-align: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
 }
 
 .button.primary {
-    background: #007bff;
-    color: white;
+    background-color: var(--primary-color);
+    color: var(--surface-color);
+    border: none;
+}
+
+.button.primary:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
 }
 
 .button.secondary {
-    background: #f8f9fa;
-    color: #333;
-    border: 1px solid #ddd;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
 }
 
-.button:hover {
-    opacity: 0.9;
+.button.secondary:hover {
+    background-color: var(--border-color);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .button {
+        width: 100%;
+    }
 }
 </style>
 {% endblock %} 

@@ -1,0 +1,312 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<div class="logs-container">
+    <div class="logs-header">
+        <h1>System Logs</h1>
+        <p class="subtitle">Monitor system activity and errors</p>
+    </div>
+
+    <div class="logs-controls">
+        <div class="log-filters">
+            <select class="form-control" id="log-level">
+                <option value="all">All Levels</option>
+                <option value="ERROR">Error</option>
+                <option value="WARNING">Warning</option>
+                <option value="INFO">Info</option>
+                <option value="DEBUG">Debug</option>
+            </select>
+            <input type="date" class="form-control" id="log-date">
+            <button class="button primary" onclick="filterLogs()">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+        </div>
+        <div class="log-actions">
+            <button class="button secondary" onclick="downloadLogs()">
+                <i class="fas fa-download"></i> Download Logs
+            </button>
+            <button class="button secondary" onclick="clearLogs()">
+                <i class="fas fa-trash"></i> Clear Logs
+            </button>
+        </div>
+    </div>
+
+    <div class="logs-content">
+        <div class="log-entries">
+            {% if logs %}
+                {% for log in logs %}
+                    <div class="log-entry {{ log.level|lower }}">
+                        <div class="log-timestamp">{{ log.timestamp }}</div>
+                        <div class="log-level">{{ log.level }}</div>
+                        <div class="log-message">{{ log.message }}</div>
+                        {% if log.details %}
+                            <div class="log-details">
+                                <pre>{{ log.details }}</pre>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>No Logs Available</h3>
+                    <p>The system logs will appear here when they are generated.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+.logs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.logs-header {
+    margin-bottom: 1rem;
+}
+
+.logs-header h1 {
+    font-size: 2rem;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.logs-controls {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.log-filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.log-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.logs-content {
+    background: var(--background-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.log-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.log-entry {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--surface-color);
+    border-radius: 0.5rem;
+    align-items: start;
+}
+
+.log-entry.error {
+    border-left: 4px solid var(--error-color);
+}
+
+.log-entry.warning {
+    border-left: 4px solid var(--warning-color);
+}
+
+.log-entry.info {
+    border-left: 4px solid var(--info-color);
+}
+
+.log-entry.debug {
+    border-left: 4px solid var(--text-light);
+}
+
+.log-timestamp {
+    font-family: monospace;
+    color: var(--text-light);
+    white-space: nowrap;
+}
+
+.log-level {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    white-space: nowrap;
+}
+
+.error .log-level {
+    background: var(--error-color-light);
+    color: var(--error-color);
+}
+
+.warning .log-level {
+    background: #FEF3C7;
+    color: var(--warning-color);
+}
+
+.info .log-level {
+    background: rgba(var(--primary-color-rgb), 0.1);
+    color: var(--primary-color);
+}
+
+.debug .log-level {
+    background: var(--border-color);
+    color: var(--text-light);
+}
+
+.log-message {
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.log-details {
+    grid-column: 1 / -1;
+    background: var(--background-color);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.log-details pre {
+    margin: 0;
+    white-space: pre-wrap;
+    font-size: 0.875rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-light);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+@media (max-width: 768px) {
+    .logs-controls {
+        flex-direction: column;
+    }
+    
+    .log-filters,
+    .log-actions {
+        width: 100%;
+    }
+    
+    .log-entry {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .log-timestamp,
+    .log-level {
+        font-size: 0.875rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+function filterLogs() {
+    const level = document.getElementById('log-level').value;
+    const date = document.getElementById('log-date').value;
+    
+    // Build query string
+    const params = new URLSearchParams();
+    if (level !== 'all') params.append('level', level);
+    if (date) params.append('date', date);
+    
+    // Redirect with filters
+    window.location.href = `{{ url_for('admin.view_logs') }}?${params.toString()}`;
+}
+
+function downloadLogs() {
+    const level = document.getElementById('log-level').value;
+    const date = document.getElementById('log-date').value;
+    
+    // Build query string
+    const params = new URLSearchParams();
+    if (level !== 'all') params.append('level', level);
+    if (date) params.append('date', date);
+    
+    // Download logs
+    fetch(`{{ url_for('admin.download_logs') }}?${params.toString()}`)
+        .then(response => response.json())
+        .then(data => {
+            // Create download link
+            const blob = new Blob([data.logs], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `logs_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        })
+        .catch(error => {
+            console.error('Error downloading logs:', error);
+            alert('Failed to download logs. Please try again.');
+        });
+}
+
+function clearLogs() {
+    if (confirm('Are you sure you want to clear all logs? This action cannot be undone.')) {
+        fetch('{{ url_for('admin.clear_logs') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Failed to clear logs. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error clearing logs:', error);
+            alert('Failed to clear logs. Please try again.');
+        });
+    }
+}
+
+// Set initial filter values from URL params
+document.addEventListener('DOMContentLoaded', function() {
+    const params = new URLSearchParams(window.location.search);
+    const level = params.get('level');
+    const date = params.get('date');
+    
+    if (level) document.getElementById('log-level').value = level;
+    if (date) document.getElementById('log-date').value = date;
+});
+</script>
+{% endblock %} 

@@ -4,7 +4,7 @@
 <div class="admin-container">
     <nav class="admin-sidebar">
         <div class="admin-nav-header">
-            <h2>Admin Panel</h2>
+            <h2><i class="fas fa-shield-alt"></i> Admin Panel</h2>
         </div>
         <ul class="admin-nav-links">
             <li {% if request.endpoint == 'admin.admin_dashboard' %}class="active"{% endif %}>
@@ -33,4 +33,104 @@
         {% block admin_content %}{% endblock %}
     </main>
 </div>
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+.admin-container {
+    display: flex;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.admin-sidebar {
+    width: 250px;
+    flex-shrink: 0;
+    background: var(--surface-color);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-md);
+    padding: 1.5rem;
+}
+
+.admin-nav-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.admin-nav-header h2 {
+    color: var(--primary-color);
+    font-size: 1.25rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.admin-nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.admin-nav-links li a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: var(--text-color);
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.admin-nav-links li a i {
+    width: 1.25rem;
+    text-align: center;
+    color: var(--text-light);
+}
+
+.admin-nav-links li a:hover {
+    background: var(--background-color);
+    color: var(--primary-color);
+}
+
+.admin-nav-links li.active a {
+    background: var(--primary-color);
+    color: var(--surface-color);
+}
+
+.admin-nav-links li.active a i {
+    color: var(--surface-color);
+}
+
+.admin-content {
+    flex: 1;
+    background: var(--surface-color);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-md);
+    padding: 2rem;
+    min-height: calc(100vh - 8rem);
+}
+
+@media (max-width: 768px) {
+    .admin-container {
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        width: 100%;
+    }
+
+    .admin-content {
+        min-height: auto;
+    }
+}
+</style>
 {% endblock %} 

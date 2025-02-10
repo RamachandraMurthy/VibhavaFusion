@@ -8,12 +8,12 @@
     margin: 2rem auto;
     background: var(--surface-color);
     border-radius: 1rem;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
     overflow: hidden;
 }
 
 .profile-header {
-    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
     padding: 2rem;
     color: var(--surface-color);
     position: relative;
@@ -30,7 +30,7 @@
     height: 120px;
     border-radius: 50%;
     border: 4px solid var(--surface-color);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
     object-fit: cover;
     background-color: var(--surface-color);
 }
@@ -43,13 +43,14 @@
     font-size: 1.8rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
+    color: var(--surface-color);
 }
 
 .profile-metadata {
     display: flex;
     gap: 1.5rem;
     font-size: 0.9rem;
-    opacity: 0.9;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .profile-metadata-item {
@@ -60,6 +61,7 @@
 
 .profile-content {
     padding: 2rem;
+    background-color: var(--surface-color);
 }
 
 .profile-section {
@@ -101,7 +103,9 @@
     border: 1px solid var(--border-color);
     border-radius: 0.5rem;
     font-size: 1rem;
-    transition: border-color 0.2s;
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    transition: all 0.2s ease;
 }
 
 .form-input:focus,
@@ -137,7 +141,8 @@
 
 .preference-description {
     font-size: 0.9rem;
-    color: var(--text-light);
+    color: var(--text-color);
+    opacity: 0.8;
     margin-bottom: 1rem;
 }
 

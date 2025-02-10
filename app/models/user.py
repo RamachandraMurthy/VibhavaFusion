@@ -24,13 +24,15 @@ class User(UserMixin, db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime)
     is_active = db.Column(db.Boolean, default=True)
+    is_admin = db.Column(db.Boolean, default=False)
     
     # Relationships will be set up by back_populates from the other models
     
-    def __init__(self, email, username, password_hash):
+    def __init__(self, email, username, password_hash, is_admin=False):
         self.email = email
         self.username = username
         self.password_hash = password_hash
+        self.is_admin = is_admin
     
     def set_password(self, password):
         """Hash and set the user's password."""
@@ -77,7 +79,8 @@ class User(UserMixin, db.Model):
             'username': self.username,
             'created_at': self.created_at.isoformat(),
             'last_login': self.last_login.isoformat() if self.last_login else None,
-            'is_active': self.is_active
+            'is_active': self.is_active,
+            'is_admin': self.is_admin
         }
     
     def __repr__(self):
