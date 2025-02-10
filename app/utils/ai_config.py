@@ -7,6 +7,7 @@ class AIConfig:
     def __init__(self):
         load_dotenv()
         self.api_key = os.getenv('OPENAI_API_KEY')
+        self.env = os.getenv('FLASK_ENV', 'development')
         self.validate_config()
         
         # Model configurations
@@ -23,10 +24,18 @@ class AIConfig:
         
     def validate_config(self):
         """Validate the configuration settings."""
+        # In development mode, we'll allow missing or invalid API keys
+        if self.env == 'development':
+            if not self.api_key:
+                print("Warning: OpenAI API key not found. Running in development mode with limited functionality.")
+                self.api_key = 'sk-dummy-key-for-development'
+            return
+            
+        # In production, we enforce strict validation
         if not self.api_key:
             raise ValueError("OpenAI API key not found in environment variables")
         
-        if not self.api_key.startswith('sk-proj-'):
+        if not self.api_key.startswith('sk-'):
             raise ValueError("Invalid OpenAI API key format")
     
     @property

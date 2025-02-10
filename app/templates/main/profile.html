@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-box">
+        <h1>Your Profile</h1>
+        <div class="form-group">
+            <label>Username</label>
+            <div class="form-control">{{ user.username }}</div>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <div class="form-control">{{ user.email }}</div>
+        </div>
+        <div class="form-group">
+            <label>Member Since</label>
+            <div class="form-control">{{ user.created_at.strftime('%B %d, %Y') }}</div>
+        </div>
+        <div class="form-group">
+            <label>Last Login</label>
+            <div class="form-control">{{ user.last_login.strftime('%B %d, %Y %I:%M %p') if user.last_login else 'Never' }}</div>
+        </div>
+        <div class="form-group">
+            <label>Account Type</label>
+            <div class="form-control">{% if user.is_admin %}Administrator{% else %}Regular User{% endif %}</div>
+        </div>
+        <div class="form-actions">
+            <a href="{{ url_for('main.index') }}" class="button secondary">Back to Home</a>
+            <a href="{{ url_for('profile.edit_profile') }}" class="button primary">Edit Profile</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 
