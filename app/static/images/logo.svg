@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        :root {
+            --logo-gradient-start: var(--primary-color, #F97316);
+            --logo-gradient-end: var(--primary-dark, #EA580C);
+            --logo-stroke: var(--surface-color, #FFFFFF);
+        }
+    </style>
+    
     <!-- Background Circle with gradient -->
     <defs>
         <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:#059669"/>
-            <stop offset="100%" style="stop-color:#0D9488"/>
+            <stop offset="0%" style="stop-color:var(--logo-gradient-start)"/>
+            <stop offset="100%" style="stop-color:var(--logo-gradient-end)"/>
         </linearGradient>
     </defs>
     
@@ -12,9 +20,9 @@
     <circle cx="20" cy="20" r="20" fill="url(#logoGradient)"/>
     
     <!-- Abstract V shape -->
-    <path d="M10 12L20 28L30 12" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M10 12L20 28L30 12" stroke="var(--logo-stroke)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
     
     <!-- Connecting lines representing fusion -->
-    <path d="M15 20H25" stroke="white" stroke-width="2" stroke-linecap="round"/>
-    <path d="M13 24H27" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    <path d="M15 20H25" stroke="var(--logo-stroke)" stroke-width="2" stroke-linecap="round"/>
+    <path d="M13 24H27" stroke="var(--logo-stroke)" stroke-width="2" stroke-linecap="round"/>
 </svg> 

@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        :root {
+            --avatar-gradient-start: var(--primary-color, #F97316);
+            --avatar-gradient-end: var(--primary-dark, #EA580C);
+            --avatar-icon-color: var(--surface-color, #FFFFFF);
+        }
+    </style>
+    
     <!-- Background Circle with gradient -->
     <defs>
         <linearGradient id="avatarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:#059669"/>
-            <stop offset="100%" style="stop-color:#0D9488"/>
+            <stop offset="0%" style="stop-color:var(--avatar-gradient-start)"/>
+            <stop offset="100%" style="stop-color:var(--avatar-gradient-end)"/>
         </linearGradient>
     </defs>
     
@@ -13,9 +21,9 @@
     
     <!-- User Icon -->
     <path d="M60 54C68.2843 54 75 47.2843 75 39C75 30.7157 68.2843 24 60 24C51.7157 24 45 30.7157 45 39C45 47.2843 51.7157 54 60 54Z" 
-          fill="white"/>
+          fill="var(--avatar-icon-color)"/>
     <path d="M84 96C84 81.6406 73.3594 70 60 70C46.6406 70 36 81.6406 36 96" 
-          stroke="white" 
+          stroke="var(--avatar-icon-color)" 
           stroke-width="12" 
           stroke-linecap="round"/>
 </svg> 

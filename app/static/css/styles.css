@@ -7,21 +7,26 @@ No inline styles should be used in templates - all styling should be defined her
 
 /* Reset and base styles */
 :root {
-    --primary-color: #059669;
-    --primary-hover: #047857;
-    --secondary-color: #0D9488;
-    --background-color: #F8F9FA;
-    --surface-color: #FFFFFF;
-    --text-color: #2D3748;
-    --text-light: #718096;
-    --border-color: #E2E8F0;
-    --success-color: #48BB78;
-    --warning-color: #F6AD55;
-    --error-color: #F56565;
-    --info-color: #4299E1;
-    --gradient-start: #059669;
-    --gradient-mid: #0D9488;
-    --gradient-end: #0891B2;
+    --primary-color: #8B4513;    /* Saddle Brown */
+    --primary-color-rgb: 139, 69, 19; /* RGB values for primary color */
+    --primary-dark: #654321;     /* Darker Brown */
+    --secondary-color: #A0522D;  /* Sienna */
+    --background-color: #FDF5E6; /* Old Lace */
+    --surface-color: #FFFFFF;    /* Keep white for contrast */
+    --text-color: #3E2723;       /* Dark Brown for text */
+    --text-light: #795548;       /* Lighter Brown for secondary text */
+    --error-color: #DC2626;      /* Keep red for errors */
+    --error-color-light: rgba(220, 38, 38, 0.1); /* Light red for error backgrounds */
+    --success-color: #059669;    /* Keep green for success */
+    --warning-color: #D97706;    /* Keep amber for warnings */
+    --info-color: #8B4513;       /* Match primary for consistency */
+    --border-color: #DEB887;     /* Burlywood for borders */
+    --shadow-sm: 0 2px 4px rgba(62, 39, 35, 0.1);
+    --shadow-md: 0 4px 6px rgba(62, 39, 35, 0.1);
+    --shadow-lg: 0 10px 15px rgba(62, 39, 35, 0.1);
+    --gradient-start: #8B4513;   /* Saddle Brown */
+    --gradient-mid: #654321;     /* Darker Brown */
+    --gradient-end: #3E2723;     /* Deep Brown */
 }
 
 * {
@@ -176,7 +181,7 @@ body {
 }
 
 .button.primary:hover {
-    background-color: var(--primary-hover);
+    background-color: var(--primary-dark);
     transform: translateY(-1px);
 }
 
@@ -358,7 +363,7 @@ body {
 }
 
 .auth-link:hover {
-    color: var(--primary-hover);
+    color: var(--primary-dark);
 }
 
 .auth-separator {
@@ -372,7 +377,7 @@ body {
     background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-mid) 50%, var(--gradient-end) 100%);
     background-size: 200% 200%;
     animation: gradientMove 15s ease infinite;
-    color: white;
+    color: var(--surface-color);
     border-radius: 1rem;
     margin-bottom: 4rem;
     position: relative;
@@ -529,9 +534,9 @@ footer {
     background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
     border-radius: 1rem;
     padding: 2rem;
-    color: white;
+    color: var(--surface-color);
     margin-bottom: 2rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
 }
 
 .dashboard-section {

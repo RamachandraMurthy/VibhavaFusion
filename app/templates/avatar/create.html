@@ -112,25 +112,25 @@
 }
 
 .card {
-    background: white;
+    background: var(--surface-color);
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
 }
 
 .card-header {
     padding: 2rem;
     text-align: center;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .card-header h1 {
     margin: 0;
-    color: #333;
+    color: var(--text-color);
     font-size: 2rem;
 }
 
 .subtitle {
-    color: #666;
+    color: var(--text-light);
     margin-top: 0.5rem;
 }
 
@@ -146,15 +146,24 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
-    color: #333;
+    color: var(--text-color);
 }
 
 .form-control {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 1rem;
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    transition: border-color 0.2s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
 }
 
 .traits-container,
@@ -191,18 +200,28 @@
 }
 
 .button.primary {
-    background: #007bff;
-    color: white;
+    background: var(--primary-color);
+    color: var(--surface-color);
 }
 
 .button.secondary {
-    background: #f8f9fa;
-    color: #333;
-    border: 1px solid #ddd;
+    background: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
 }
 
 .button:hover {
     opacity: 0.9;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+.button.primary:hover {
+    background: var(--primary-dark);
+}
+
+.button.secondary:hover {
+    background: var(--border-color);
 }
 </style>
 {% endblock %} 
